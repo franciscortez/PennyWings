@@ -45,11 +45,13 @@ export default function TransactionForm({ isOpen, onClose, onSubmit }) {
     e.preventDefault()
     setLoading(true)
     try {
+      const cashWallet = wallets.find(w => w.wallet_type === 'cash')
       const data = {
         ...formData,
         amount: Number(formData.amount),
         card_id: formData.payment_method === 'card' ? formData.card_id : null,
-        wallet_id: formData.payment_method === 'ewallet' ? formData.wallet_id : null
+        wallet_id: formData.payment_method === 'ewallet' ? formData.wallet_id : 
+                   (formData.payment_method === 'cash' && cashWallet ? cashWallet.id : null)
       }
       await onSubmit(data)
       onClose()
@@ -145,8 +147,12 @@ export default function TransactionForm({ isOpen, onClose, onSubmit }) {
                     {wallets.map(w => <option key={w.id} value={w.id}>{w.wallet_name}</option>)}
                   </select>
                 ) : (
-                  <div className="px-4 py-3 bg-gray-100 border border-gray-200 rounded-xl text-gray-400 text-sm font-bold">
-                    No account needed
+                  <div className={`px-4 py-3 border rounded-xl text-sm font-bold ${
+                    wallets.some(w => w.wallet_type === 'cash') 
+                      ? 'bg-pink-50/50 text-gray-700 border-pink-100' 
+                      : 'bg-gray-100 text-gray-400 border-gray-200'
+                  }`}>
+                    {wallets.some(w => w.wallet_type === 'cash') ? 'Cash on Hand Account' : 'Not tracked in accounts'}
                   </div>
                 )}
               </div>

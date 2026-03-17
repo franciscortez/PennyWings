@@ -41,10 +41,10 @@ export default function Dashboard() {
     <Layout>
       <div className="space-y-10 pb-20">
         {/* Header */}
-        <div className="flex justify-between items-end">
+        <div className="flex flex-col md:flex-row md:justify-between md:items-end gap-4">
           <div>
-            <h1 className="text-4xl font-black text-gray-900 tracking-tight mb-2">My PennyWings</h1>
-            <p className="text-gray-500 font-medium italic">"Every penny has wings, keep them flying in the right direction."</p>
+            <h1 className="text-3xl sm:text-4xl font-black text-gray-900 tracking-tight mb-2">My PennyWings</h1>
+            <p className="text-sm sm:text-base text-gray-500 font-medium italic">"Every penny has wings, keep them flying in the right direction."</p>
           </div>
           <div className="hidden md:block text-right">
             <p className="text-xs font-black text-pink-400 uppercase tracking-widest mb-1">Current Date</p>
@@ -55,40 +55,40 @@ export default function Dashboard() {
         {/* Main Stats Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Total Balance Card */}
-          <div className="lg:col-span-2 relative overflow-hidden bg-gradient-to-br from-pink-500 to-pink-600 rounded-[3rem] p-10 text-white shadow-2xl shadow-pink-200 group">
+          <div className="lg:col-span-2 relative overflow-hidden bg-gradient-to-br from-pink-500 to-pink-600 rounded-[2.5rem] md:rounded-[3rem] p-6 sm:p-8 md:p-10 text-white shadow-2xl shadow-pink-200 group">
             <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full translate-x-10 translate-y-[-20px] blur-3xl group-hover:scale-110 transition-transform duration-700"></div>
             <div className="relative z-10">
-              <div className="flex items-center gap-3 mb-8">
-                <div className="p-3 bg-white/20 backdrop-blur-md rounded-2xl border border-white/30">
-                  <Icon name="bank" color="white" className="w-8 h-8" />
+              <div className="flex items-center gap-3 mb-6 md:mb-8">
+                <div className="p-2 sm:p-3 bg-white/20 backdrop-blur-md rounded-xl sm:rounded-2xl border border-white/30">
+                  <Icon name="bank" color="white" className="w-6 h-6 sm:w-8 sm:h-8" />
                 </div>
-                <p className="text-sm font-black uppercase tracking-[0.2em] opacity-80">Total Net Worth</p>
+                <p className="text-xs sm:text-sm font-black uppercase tracking-[0.2em] opacity-80">Total Net Worth</p>
               </div>
-              <h2 className="text-6xl font-black tracking-tighter mb-10">
+              <h2 className="text-5xl sm:text-6xl lg:text-7xl font-black tracking-tighter mb-8 sm:mb-10 break-all">
                 ₱{totalBalance.toLocaleString('en-PH', { minimumFractionDigits: 2 })}
               </h2>
-              <div className="flex gap-10">
+              <div className="flex flex-col sm:flex-row gap-6 sm:gap-10">
                 <div>
                   <div className="flex items-center gap-2 opacity-80 mb-1">
                     <Icon name="income" color="#6EE7B7" className="w-4 h-4" />
-                    <p className="text-xs font-bold uppercase tracking-widest">Monthly Income</p>
+                    <p className="text-[10px] sm:text-xs font-bold uppercase tracking-widest">Monthly Income</p>
                   </div>
-                  <p className="text-2xl font-black">₱{stats.income.toLocaleString()}</p>
+                  <p className="text-2xl sm:text-3xl font-black">₱{stats.income.toLocaleString()}</p>
                 </div>
                 <div>
                   <div className="flex items-center gap-2 opacity-80 mb-1">
                     <Icon name="expense" color="#FDA4AF" className="w-4 h-4" />
-                    <p className="text-xs font-bold uppercase tracking-widest">Monthly Expenses</p>
+                    <p className="text-[10px] sm:text-xs font-bold uppercase tracking-widest">Monthly Expenses</p>
                   </div>
-                  <p className="text-2xl font-black">₱{stats.expenses.toLocaleString()}</p>
+                  <p className="text-2xl sm:text-3xl font-black">₱{stats.expenses.toLocaleString()}</p>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Quick Actions / Reports Summary */}
-          <div className="bg-white rounded-[3.5rem] p-8 border border-pink-50 shadow-sm flex flex-col">
-            <h3 className="text-xl font-black text-gray-800 mb-6 flex items-center gap-2">
+          <div className="bg-white rounded-[2.5rem] md:rounded-[3.5rem] p-6 sm:p-8 border border-pink-50 shadow-sm flex flex-col">
+            <h3 className="text-lg sm:text-xl font-black text-gray-800 mb-6 flex items-center gap-2">
               <span className="w-2 h-8 bg-pink-500 rounded-full"></span>
               Pulse Report
             </h3>
@@ -127,13 +127,13 @@ export default function Dashboard() {
         </div>
 
         {/* Recent Activity */}
-        <div className="bg-white rounded-[3.5rem] p-10 border border-pink-50 shadow-sm">
-          <div className="flex justify-between items-center mb-10">
-            <h3 className="text-2xl font-black text-gray-900 tracking-tight flex items-center gap-3">
-              <Icon name="clock" color="#EC4899" className="w-7 h-7" />
+        <div className="bg-white rounded-[2.5rem] md:rounded-[3.5rem] p-6 sm:p-10 border border-pink-50 shadow-sm">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8 sm:mb-10">
+            <h3 className="text-xl sm:text-2xl font-black text-gray-900 tracking-tight flex items-center gap-3">
+              <Icon name="clock" color="#EC4899" className="w-6 h-6 sm:w-7 sm:h-7" />
               Recent Activity
             </h3>
-            <Link to="/transactions" className="text-sm font-black text-pink-500 hover:text-pink-600 flex items-center gap-1 group">
+            <Link to="/transactions" className="text-sm font-black text-pink-500 hover:text-pink-600 flex items-center gap-1 group self-start sm:self-auto">
               View All History
               <Icon name="plus" color="currentColor" className="w-4 h-4 rotate-90 group-hover:translate-x-1 transition-transform" />
             </Link>
@@ -147,27 +147,30 @@ export default function Dashboard() {
               </div>
             ) : transactions?.length > 0 ? (
               transactions.map(tx => (
-                <div key={tx?.id} className="flex items-center gap-5 p-5 bg-white border border-pink-50 rounded-[2.5rem] hover:shadow-xl hover:translate-x-2 transition-all group">
+                <div key={tx?.id} className="flex items-center gap-3 sm:gap-5 p-4 sm:p-5 bg-white border border-pink-50 rounded-[2rem] sm:rounded-[2.5rem] hover:shadow-xl sm:hover:translate-x-2 transition-all group overflow-hidden">
                   <div 
-                    className="w-16 h-16 rounded-2xl flex items-center justify-center p-4 shadow-sm group-hover:scale-110 transition-transform"
+                    className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl flex items-center justify-center p-3 sm:p-4 shadow-sm group-hover:scale-110 transition-transform shrink-0"
                     style={{ backgroundColor: tx?.category?.color || '#F3F4F6' }}
                   >
                     <Icon 
                       name={tx?.type === 'income' ? 'income' : 'expense'} 
                       color="white" 
+                      className="w-5 h-5 sm:w-8 sm:h-8"
                     />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-lg font-black text-gray-900 truncate tracking-tight">{tx?.description || tx?.category?.name || 'Uncategorized'}</p>
-                    <p className="text-sm font-bold text-gray-400 flex items-center gap-2 uppercase tracking-widest">
-                      {tx?.category?.name || 'No Category'} • {tx?.transaction_date ? new Date(tx.transaction_date).toLocaleDateString() : 'No Date'}
+                    <p className="text-base sm:text-lg font-black text-gray-900 truncate tracking-tight">{tx?.description || tx?.category?.name || 'Uncategorized'}</p>
+                    <p className="text-[10px] sm:text-sm font-bold text-gray-400 flex flex-wrap items-center gap-1 sm:gap-2 uppercase tracking-widest">
+                      <span className="truncate max-w-[100px] sm:max-w-none">{tx?.category?.name || 'No Category'}</span> 
+                      <span className="hidden sm:inline">•</span> 
+                      <span className="shrink-0">{tx?.transaction_date ? new Date(tx.transaction_date).toLocaleDateString() : 'No Date'}</span>
                     </p>
                   </div>
-                  <div className="text-right">
-                    <p className={`text-xl font-black tracking-tighter ${tx?.type === 'income' ? 'text-emerald-500' : 'text-gray-900'}`}>
+                  <div className="text-right shrink-0 ml-2">
+                    <p className={`text-lg sm:text-xl font-black tracking-tighter ${tx?.type === 'income' ? 'text-emerald-500' : 'text-gray-900'}`}>
                       {tx?.type === 'income' ? '+' : '-'}₱{Number(tx?.amount || 0).toLocaleString()}
                     </p>
-                    <p className="text-[10px] font-black text-gray-300 uppercase tracking-tighter">
+                    <p className="text-[9px] sm:text-[10px] font-black text-gray-300 uppercase tracking-tighter truncate max-w-[70px] sm:max-w-[120px] ml-auto">
                       {tx?.card?.card_name || tx?.wallet?.wallet_name || 'Cash'}
                     </p>
                   </div>

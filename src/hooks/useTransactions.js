@@ -8,9 +8,9 @@ export const useTransactions = (limit = 10) => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
-  const fetchTransactions = useCallback(async () => {
+  const fetchTransactions = useCallback(async (background = false) => {
     try {
-      setLoading(true)
+      if (!background) setLoading(true)
       const { data, error } = await supabase
         .from('transactions')
         .select(`
@@ -29,7 +29,7 @@ export const useTransactions = (limit = 10) => {
     } catch (err) {
       setError(err.message)
     } finally {
-      setLoading(false)
+      if (!background) setLoading(false)
     }
   }, [user?.id, limit])
 
@@ -41,7 +41,7 @@ export const useTransactions = (limit = 10) => {
         .channel('transactions_changes')
         .on('postgres_changes', 
           { event: '*', schema: 'public', table: 'transactions', filter: `user_id=eq.${user.id}` }, 
-          () => fetchTransactions()
+          () => fetchTransactions(true)
         )
         .subscribe()
 
@@ -53,6 +53,17 @@ export const useTransactions = (limit = 10) => {
 
   const addTransaction = async (transactionData) => {
     try {
+      const tempId = 'temp-' + Date.now();
+      const optimisticTx = {
+        ...transactionData,
+        id: tempId,
+        user_id: user?.id,
+        category: {},
+        card: {},
+        wallet: {}
+      }
+      setTransactions(prev => [optimisticTx, ...prev].slice(0, limit))
+
       // 1. Insert Transaction
       const { data: transaction, error: txError } = await supabase
         .from('transactions')
@@ -61,6 +72,8 @@ export const useTransactions = (limit = 10) => {
         .single()
 
       if (txError) throw txError
+      
+      setTransactions(prev => prev.map(t => t.id === tempId ? { ...transaction, category: {}, card: {}, wallet: {} } : t))
 
       // 2. Update Balance if card_id or wallet_id is provided
       const amount = Number(transaction.amount)
@@ -105,12 +118,15 @@ export const useTransactions = (limit = 10) => {
       return { data: transaction, error: null }
     } catch (err) {
       console.error('Error adding transaction:', err)
+      fetchTransactions(true)
       return { data: null, error: err.message }
     }
   }
 
   const deleteTransaction = async (transaction) => {
     try {
+      setTransactions(prev => prev.filter(t => t.id !== transaction.id))
+      
       // 1. Delete Transaction
       const { error: delError } = await supabase
         .from('transactions')
@@ -162,6 +178,7 @@ export const useTransactions = (limit = 10) => {
       return { error: null }
     } catch (err) {
       console.error('Error deleting transaction:', err)
+      fetchTransactions(true)
       return { error: err.message }
     }
   }

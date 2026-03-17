@@ -38,7 +38,7 @@ This document tracks the development progress of the Budget Tracker application 
   - ✅ Login/Signup components (with enhanced 2-column design)
   - ✅ Protected routes
   - ✅ Password reset flow
-  - ⏸️ User profile management
+  - ✅ User profile management
 - ✅ **Database Schema & RLS** - Completed
   - ✅ Create profiles table
   - ✅ Create bank_cards table
@@ -57,17 +57,17 @@ This document tracks the development progress of the Budget Tracker application 
    - ✅ Color and theme customization
    - ✅ Total balance calculation across all accounts (Net Worth)
    - ✅ Real-time account updates
-- 🔄 **Transaction Management** - In Progress
+- ✅ **Transaction Management** - Completed
   - ✅ Fetch transactions with account/category relationships
   - ✅ Recent transactions list on Dashboard
-  - ⏸️ Add/Edit transaction form
-  - ⏸️ Link transaction to bank card or e-wallet
-  - ⏸️ Payment method dropdown (Cash/Card/E-Wallet)
-  - ⏸️ Category selection
-  - ⏸️ Income/Expense/Withdrawal toggle
-  - ⏸️ Date picker
+  - ✅ Add/Edit transaction form
+  - ✅ Link transaction to bank card or e-wallet
+  - ✅ Payment method dropdown (Cash/Card/E-Wallet)
+  - ✅ Category selection
+  - ✅ Income/Expense/Withdrawal toggle
+  - ✅ Date picker
   - ⏸️ Receipt upload
-  - ⏸️ Filter by card, wallet, category, date, payment method
+  - ✅ Filter by card, wallet, category, date, payment method
   - ✅ Auto-update account balance (implemented in hooks)
 - 🚫 **Budget Management** - Removed (by User request)
   - Budget setup per category
@@ -135,6 +135,26 @@ This document tracks the development progress of the Budget Tracker application 
 
 ---
 ```
+
+### Accounts & Transactions Improvement - 2026-03-17
+**Status:** ✅ Completed
+
+**Description:**
+Improved Accounts UI by separating cash from e-wallets, optimizing mobile layouts, adding card/text color customizability during creation and editing, and resolving transaction logic issues linking 'cash' payments to the 'Cash on Hand' account.
+
+**Files Modified/Created:**
+- `src/components/accounts/AccountWizard.jsx` (Color controls, cash logic, layout)
+- `src/components/accounts/EditAccountModal.jsx` (Added color editing)
+- `src/pages/Accounts.jsx` (Mobile responsiveness, cash filter tab)
+- `src/components/transactions/TransactionForm.jsx` (Cash wallet mapping)
+
+**Outcome:**
+- Users can now select both card background and text colors via Account Wizard and EditAccountModal.
+- Accounts page features a dedicated "Cash" tab with horizontally scrollable responsive filters for mobile.
+- "Cash on Hand" option logic correctly prevents duplicating cash accounts.
+- Transactions marked as 'cash' now successfully link to and update the balance of the 'Cash on Hand' e-wallet.
+
+---
 
 ### Dashboard & Accounts Refactor - 2026-03-17
 **Status:** ✅ Completed
@@ -358,7 +378,7 @@ Implemented the end-to-end password reset flow. This included adding `updatePass
 - ✅ Build signup component with pink theme
 - ✅ Implement password reset flow
 - ✅ Set up protected route wrapper component
-- ⏸️ Create user profile page
+- ✅ Create user profile page
 - ✅ Add logout functionality
 - ✅ Handle auth state persistence
 

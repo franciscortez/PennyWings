@@ -16,7 +16,9 @@ import {
   Wallet2,
   User,
   X,
-  LogOut 
+  LogOut,
+  ArrowLeft,
+  Banknote
 } from 'lucide-react';
 
 const icons = {
@@ -37,7 +39,9 @@ const icons = {
   ewallet: Wallet2,
   user: User,
   x: X,
-  logout: LogOut
+  logout: LogOut,
+  arrowLeft: ArrowLeft,
+  cash: Banknote
 };
 
 const Icon = ({ name, color = 'currentColor', className = "w-6 h-6", size, ...props }) => {

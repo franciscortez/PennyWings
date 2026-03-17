@@ -1,6 +1,17 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useEffect } from "react"; // trigger-reload
+import { useAuth } from "../contexts/AuthContext";
 
 export default function Home() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user) {
+      navigate("/dashboard");
+    }
+  }, [user, navigate]);
+
   const features = [
     {
       title: "Smart Tracking",

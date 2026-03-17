@@ -11,7 +11,7 @@ const navigation = [
 ]
 
 export default function Layout({ children }) {
-  const { user, signOut } = useAuth()
+  const { user, profile, signOut } = useAuth()
   const location = useLocation()
 
   const handleLogout = () => {
@@ -52,9 +52,12 @@ export default function Layout({ children }) {
           <span className="font-bold text-gray-800 tracking-tight">PennyWings</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-pink-50 rounded-full flex items-center justify-center text-pink-500">
+          <Link 
+            to="/profile"
+            className="w-8 h-8 bg-pink-50 rounded-full flex items-center justify-center text-pink-500 hover:bg-pink-100 transition-colors"
+          >
             <Icon name="user" className="w-5 h-5" />
-          </div>
+          </Link>
           <button 
             onClick={handleLogout}
             className="p-2 text-rose-500 hover:bg-rose-50 rounded-full transition-colors"
@@ -101,16 +104,24 @@ export default function Layout({ children }) {
         </nav>
 
         <div className="p-4 border-t border-pink-50">
-          <div className="bg-pink-50 rounded-2xl p-4 mb-4">
-            <div className="flex items-center gap-3 mb-1">
-              <div className="w-10 h-10 bg-pink-100 rounded-full flex items-center justify-center p-2 text-pink-400">
+          <Link 
+            to="/profile"
+            className="block bg-pink-50 rounded-2xl p-4 mb-4 hover:bg-pink-100 transition-all border border-transparent hover:border-pink-200 group"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center p-2 text-pink-500 shadow-sm group-hover:scale-110 transition-transform">
                 <Icon name="user" color="currentColor" />
               </div>
               <div className="overflow-hidden">
-                <p className="text-sm font-bold text-gray-800 truncate">{user?.email?.split('@')[0]}</p>
+                <p className="text-sm font-bold text-gray-800 truncate">
+                  {profile?.full_name || 'Set your name'}
+                </p>
+                <p className="text-[10px] font-black text-pink-400 uppercase tracking-widest truncate">
+                  View Profile
+                </p>
               </div>
             </div>
-          </div>
+          </Link>
           <button 
             onClick={handleLogout}
             className="w-full flex items-center gap-3 px-4 py-2 text-gray-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-colors text-sm font-medium"

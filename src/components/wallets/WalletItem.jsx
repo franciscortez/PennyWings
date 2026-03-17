@@ -27,7 +27,7 @@ export default function WalletItem({ wallet, onEdit, onDelete }) {
               </h3>
             </div>
             <div className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center border border-white/30 p-2">
-              <Icon name="wallet" color="white" />
+              <Icon name={wallet.wallet_type === 'cash' ? 'cash' : 'wallet'} color="white" />
             </div>
           </div>
           

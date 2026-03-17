@@ -8,9 +8,9 @@ export const useBankCards = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
-  const fetchCards = useCallback(async () => {
+  const fetchCards = useCallback(async (background = false) => {
     try {
-      setLoading(true)
+      if (!background) setLoading(true)
       const { data, error } = await supabase
         .from('bank_cards')
         .select('*')
@@ -22,7 +22,7 @@ export const useBankCards = () => {
     } catch (err) {
       setError(err.message)
     } finally {
-      setLoading(false)
+      if (!background) setLoading(false)
     }
   }, [user?.id])
 
@@ -34,6 +34,7 @@ export const useBankCards = () => {
         .select()
 
       if (error) throw error
+      if (data) setCards(prev => [data[0], ...prev])
       return { data, error: null }
     } catch (err) {
       return { data: null, error: err.message }
@@ -42,6 +43,7 @@ export const useBankCards = () => {
 
   const updateCard = async (id, updates) => {
     try {
+      setCards(prev => prev.map(c => c.id === id ? { ...c, ...updates } : c))
       const { data, error } = await supabase
         .from('bank_cards')
         .update(updates)
@@ -51,12 +53,14 @@ export const useBankCards = () => {
       if (error) throw error
       return { data, error: null }
     } catch (err) {
+      fetchCards(true) // Revert on error
       return { data: null, error: err.message }
     }
   }
 
   const deleteCard = async (id) => {
     try {
+      setCards(prev => prev.filter(c => c.id !== id))
       const { error } = await supabase
         .from('bank_cards')
         .delete()
@@ -65,6 +69,7 @@ export const useBankCards = () => {
       if (error) throw error
       return { error: null }
     } catch (err) {
+      fetchCards(true) // Revert on error
       return { error: err.message }
     }
   }
@@ -79,7 +84,7 @@ export const useBankCards = () => {
         .on('postgres_changes', 
           { event: '*', schema: 'public', table: 'bank_cards', filter: `user_id=eq.${user.id}` }, 
           () => {
-            fetchCards()
+            fetchCards(true)
           }
         )
         .subscribe()

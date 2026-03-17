@@ -103,6 +103,8 @@ User Action → React Component → Supabase Client → PostgreSQL + RLS → Rea
 
 - **Theme**: Light pink aesthetic (#FFC0CB, #FFB6C1, #FFF0F5)
 - **Framework**: Tailwind CSS with custom pink color palette
+- **Icons**: Lucide React for consistent, theme-aware iconography
+- **Notifications**: SweetAlert2 for premium, themed dialogs
 - **Components**: Card-based UI with mobile-first responsive design
 - **Accessibility**: WCAG compliant contrast ratios on pink backgrounds
 

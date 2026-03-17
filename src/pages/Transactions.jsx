@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Layout from "../components/Layout";
 import { useTransactions } from "../hooks/useTransactions";
 import TransactionForm from "../components/transactions/TransactionForm";
@@ -6,10 +6,12 @@ import Icon from "../components/Icon";
 import Swal from 'sweetalert2'
 
 export default function Transactions() {
-  const { transactions, loading, addTransaction, deleteTransaction } = useTransactions(50);
+  const { transactions, loading, addTransaction, deleteTransaction } = useTransactions(100);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   const handleAddTransaction = async (data) => {
     const { error } = await addTransaction(data);
@@ -65,7 +67,19 @@ export default function Transactions() {
                          (tx.category?.name || "").toLowerCase().includes(searchQuery.toLowerCase());
     const matchesType = filterType === "all" || tx.type === filterType;
     return matchesSearch && matchesType;
-  });
+  }) || [];
+
+  // Pagination Logic
+  const totalPages = Math.ceil(filteredTransactions.length / itemsPerPage);
+  const paginatedTransactions = filteredTransactions.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, filterType]);
 
   return (
     <Layout>
@@ -74,7 +88,7 @@ export default function Transactions() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h1 className="text-4xl font-black text-gray-900 tracking-tight mb-2">Transaction History</h1>
-            <p className="text-gray-500 font-medium">Keep track of every wing your pennies take.</p>
+            <p className="text-gray-500 font-medium font-bold">Manage your cashflow with precision.</p>
           </div>
           <button 
             onClick={() => setIsFormOpen(true)}
@@ -86,112 +100,162 @@ export default function Transactions() {
         </div>
 
         {/* Filters & Search */}
-        <div className="flex flex-col lg:flex-row gap-4 items-center bg-white/50 backdrop-blur-md p-4 rounded-[2.5rem] border border-pink-100 shadow-sm">
-          <div className="relative flex-1 w-full">
-            <Icon name="search" color="#F9A8D4" className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5" />
-            <input 
-              type="text" 
-              placeholder="Search by description or category..." 
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-12 pr-6 py-4 bg-white border border-pink-100 rounded-[1.8rem] focus:ring-4 focus:ring-pink-500/10 focus:border-pink-500 outline-none transition-all font-bold text-gray-700"
-            />
+        <div className="flex flex-col lg:flex-row gap-4 items-center bg-white p-6 rounded-[2.5rem] border border-pink-50 shadow-sm">
+          <div className="relative flex-1 w-full text-left">
+            <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-4">Search Ledger</label>
+            <div className="relative">
+              <Icon name="search" color="#F9A8D4" className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5" />
+              <input 
+                type="text" 
+                placeholder="Description, category..." 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-12 pr-6 py-4 bg-pink-50/30 border border-pink-100 rounded-[1.5rem] focus:ring-4 focus:ring-pink-500/10 focus:border-pink-500 outline-none transition-all font-bold text-gray-700"
+              />
+            </div>
           </div>
-          <div className="flex gap-2 w-full lg:w-auto overflow-x-auto pb-1 lg:pb-0">
-            {['all', 'income', 'expense', 'withdrawal'].map(type => (
-              <button
-                key={type}
-                onClick={() => setFilterType(type)}
-                className={`px-6 py-4 rounded-[1.5rem] font-black text-xs uppercase tracking-widest transition-all whitespace-nowrap ${
-                  filterType === type 
-                    ? 'bg-gray-900 text-white shadow-lg scale-105' 
-                    : 'bg-white text-gray-400 hover:text-pink-500 hover:bg-pink-50'
-                }`}
-              >
-                {type}
-              </button>
-            ))}
+          <div className="w-full lg:w-auto text-left">
+            <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-4">Filter Type</label>
+            <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+              {['all', 'income', 'expense', 'withdrawal'].map(type => (
+                <button
+                  key={type}
+                  onClick={() => setFilterType(type)}
+                  className={`px-6 py-4 rounded-[1.2rem] font-bold text-xs uppercase tracking-widest transition-all whitespace-nowrap ${
+                    filterType === type 
+                      ? 'bg-gray-900 text-white shadow-lg' 
+                      : 'bg-pink-50/50 text-gray-400 hover:text-pink-500 hover:bg-pink-100/50 border border-pink-50'
+                  }`}
+                >
+                  {type}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
-        {/* Transactions List */}
-        <div className="space-y-4">
+        {/* Transactions Table */}
+        <div className="bg-white rounded-[3rem] border border-pink-50 shadow-xl shadow-pink-100/20 overflow-hidden">
           {loading ? (
             <div className="py-20 flex flex-col items-center">
               <div className="w-12 h-12 border-4 border-pink-100 border-t-pink-500 rounded-full animate-spin mb-4"></div>
-              <p className="text-gray-400 font-black tracking-widest uppercase animate-pulse">Fetching Ledger...</p>
+              <p className="text-gray-400 font-black tracking-widest uppercase animate-pulse text-xs">Fetching Ledger...</p>
             </div>
-          ) : filteredTransactions?.length > 0 ? (
-            filteredTransactions.map(tx => (
-              <div key={tx.id} className="group relative flex items-center gap-6 p-6 bg-white border border-pink-50 rounded-[3rem] hover:shadow-2xl hover:shadow-pink-100/50 hover:translate-x-3 transition-all">
-                {/* Category Icon */}
-                <div 
-                  className="w-20 h-20 rounded-[2rem] flex items-center justify-center p-5 shadow-sm transition-transform group-hover:scale-110 group-hover:rotate-6"
-                  style={{ backgroundColor: tx.category?.color || '#F3F4F6' }}
-                >
-                  <Icon 
-                    name={tx.type === 'income' ? 'income' : tx.type === 'withdrawal' ? 'withdrawal' : 'expense'} 
-                    color="white" 
-                  />
-                </div>
-
-                {/* Info */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-3 mb-1">
-                    <p className="text-xl font-extrabold text-gray-900 truncate tracking-tight">{tx.description || tx.category?.name}</p>
-                    <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter ${
-                      tx.type === 'income' ? 'bg-emerald-100 text-emerald-600' :
-                      tx.type === 'expense' ? 'bg-pink-100 text-pink-600' :
-                      'bg-orange-100 text-orange-600'
-                    }`}>
-                      {tx.type}
-                    </span>
-                  </div>
-                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
-                    <p className="text-sm font-bold text-pink-400 flex items-center gap-2 uppercase tracking-widest">
-                       {tx.category?.name || 'Uncategorized'}
-                    </p>
-                    <span className="text-gray-200">•</span>
-                    <p className="text-sm font-bold text-gray-400 flex items-center gap-2 uppercase tracking-widest">
-                      <Icon name="clock" color="currentColor" className="w-4 h-4" />
-                      {new Date(tx.transaction_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                    </p>
-                    <span className="text-gray-200 uppercase tracking-widest">•</span>
-                    <p className="text-sm font-bold text-gray-400 flex items-center gap-2 uppercase tracking-widest">
-                      <Icon name="bank" color="currentColor" className="w-4 h-4" />
-                      {tx.card?.card_name || tx.wallet?.wallet_name || 'Cash'}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Amount & Actions */}
-                <div className="flex items-center gap-6">
-                  <div className="text-right">
-                    <p className={`text-3xl font-black tracking-tighter ${tx.type === 'income' ? 'text-emerald-500' : 'text-gray-900'}`}>
-                      {tx.type === 'income' ? '+' : '-'}₱{Number(tx.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                    </p>
-                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">
-                      {tx.payment_method}
-                    </p>
-                  </div>
-                  <button 
-                    onClick={() => handleDeleteTransaction(tx)}
-                    className="p-4 text-gray-300 hover:text-rose-500 hover:bg-rose-50 rounded-2xl transition-all opacity-0 group-hover:opacity-100"
-                  >
-                    <Icon name="delete" color="currentColor" className="w-6 h-6" />
-                  </button>
-                </div>
-              </div>
-            ))
+          ) : filteredTransactions.length > 0 ? (
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse text-left">
+                <thead>
+                  <tr className="bg-pink-50/50 border-b border-pink-100">
+                    <th className="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Transaction</th>
+                    <th className="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Category</th>
+                    <th className="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Account</th>
+                    <th className="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] text-right">Amount</th>
+                    <th className="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] text-center">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-pink-50">
+                  {paginatedTransactions.map(tx => (
+                    <tr key={tx.id} className="group hover:bg-pink-50/30 transition-colors">
+                      <td className="px-8 py-6">
+                        <div>
+                          <p className="font-black text-gray-900 tracking-tight leading-none mb-1">{tx.description || tx.category?.name}</p>
+                          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1">
+                            <Icon name="clock" className="w-3 h-3" />
+                            {new Date(tx.transaction_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                          </p>
+                        </div>
+                      </td>
+                      <td className="px-8 py-6">
+                        <span className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-pink-50 text-pink-500 text-xs font-black uppercase tracking-widest border border-pink-100">
+                          {tx.category?.name || 'Uncategorized'}
+                        </span>
+                      </td>
+                      <td className="px-8 py-6">
+                        <div className="flex items-center gap-2 text-gray-500">
+                          <Icon name="bank" className="w-4 h-4 opacity-50" />
+                          <span className="text-xs font-bold uppercase tracking-wider">
+                            {tx.card?.card_name || tx.wallet?.wallet_name || 'Cash'}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-8 py-6 text-right">
+                        <p className={`text-xl font-black tracking-tighter ${
+                          tx.type === 'income' ? 'text-emerald-500' : 
+                          tx.type === 'withdrawal' ? 'text-amber-500' : 
+                          'text-rose-500'
+                        }`}>
+                          {tx.type === 'income' ? '+' : '-'}₱{Number(tx.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                        </p>
+                        <span className={`inline-block mt-1 px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest ${
+                          tx.type === 'income' ? 'bg-emerald-50 text-emerald-500' :
+                          tx.type === 'withdrawal' ? 'bg-amber-50 text-amber-500' :
+                          'bg-rose-50 text-rose-500'
+                        }`}>
+                          {tx.type}
+                        </span>
+                        <p className="text-[9px] font-black text-gray-300 uppercase tracking-[0.2em] mt-0.5">
+                          {tx.payment_method}
+                        </p>
+                      </td>
+                      <td className="px-8 py-6 text-center">
+                        <button 
+                          onClick={() => handleDeleteTransaction(tx)}
+                          className="p-3 text-gray-200 hover:text-rose-500 hover:bg-rose-50 rounded-xl transition-all"
+                        >
+                          <Icon name="delete" color="currentColor" className="w-5 h-5" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           ) : (
-            <div className="py-24 text-center bg-gray-50/50 rounded-[4rem] border-4 border-dashed border-pink-100/50">
-              <div className="w-24 h-24 bg-pink-100 rounded-[2.5rem] flex items-center justify-center mx-auto mb-8 shadow-inner p-6">
-                 <Icon name="bank" color="#F9A8D4" className="w-12 h-12" />
+            <div className="py-24 text-center">
+              <div className="w-20 h-20 bg-pink-50 rounded-[2rem] flex items-center justify-center mx-auto mb-6">
+                 <Icon name="bank" color="#F9A8D4" className="w-10 h-10" />
               </div>
-              <p className="text-xl font-black text-gray-400 uppercase tracking-widest mb-4">No records found</p>
-              <p className="text-gray-400 max-w-xs mx-auto font-medium">
-                Try adjusting your filters or record a new transaction to see it here.
+              <p className="text-lg font-black text-gray-400 uppercase tracking-widest">No entries found</p>
+            </div>
+          )}
+
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="px-8 py-6 bg-pink-50/30 border-t border-pink-100 flex items-center justify-between">
+              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                Showing <span className="text-pink-500">{(currentPage-1)*itemsPerPage + 1}</span> to <span className="text-pink-500">{Math.min(currentPage*itemsPerPage, filteredTransactions.length)}</span> of {filteredTransactions.length}
               </p>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                  disabled={currentPage === 1}
+                  className="p-3 rounded-xl bg-white border border-pink-100 text-gray-400 hover:text-pink-500 hover:border-pink-200 transition-all disabled:opacity-30"
+                >
+                  <Icon name="arrowLeft" className="w-4 h-4" />
+                </button>
+                <div className="flex gap-1">
+                  {[...Array(totalPages)].map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setCurrentPage(i + 1)}
+                      className={`w-10 h-10 rounded-xl text-xs font-black transition-all ${
+                        currentPage === i + 1
+                          ? 'bg-pink-500 text-white shadow-lg'
+                          : 'bg-white border border-pink-100 text-gray-400 hover:bg-pink-50'
+                      }`}
+                    >
+                      {i + 1}
+                    </button>
+                  ))}
+                </div>
+                <button
+                  onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                  disabled={currentPage === totalPages}
+                  className="p-3 rounded-xl bg-white border border-pink-100 text-gray-400 hover:text-pink-500 hover:border-pink-200 transition-all rotate-180 disabled:opacity-30"
+                >
+                  <Icon name="arrowLeft" className="w-4 h-4" />
+                </button>
+              </div>
             </div>
           )}
         </div>

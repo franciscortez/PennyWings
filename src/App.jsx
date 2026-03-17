@@ -10,6 +10,7 @@ import Dashboard from './pages/Dashboard'
 import Transactions from './pages/Transactions'
 import Accounts from './pages/Accounts'
 import TermsAndAgreement from './pages/auth/TermsAndAgreement'
+import Profile from './pages/Profile'
 
 export default function App() {
   return (
@@ -43,6 +44,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <Transactions />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Profile />
               </ProtectedRoute>
             }
           />
