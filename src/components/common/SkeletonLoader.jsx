@@ -1,6 +1,6 @@
-import React from 'react';
+import React from "react";
 
-export default function SkeletonLoader({ className = '' }) {
+export default function SkeletonLoader({ className = "" }) {
   return (
     <div className={`animate-pulse bg-pink-100/50 rounded-2xl ${className}`} />
   );
