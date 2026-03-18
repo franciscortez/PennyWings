@@ -11,6 +11,7 @@ import Transactions from './pages/Transactions'
 import Accounts from './pages/Accounts'
 import TermsAndAgreement from './pages/auth/TermsAndAgreement'
 import Profile from './pages/Profile'
+import Reports from './pages/Reports'
 
 export default function App() {
   return (
@@ -52,6 +53,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <Profile />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/reports"
+            element={
+              <ProtectedRoute>
+                <Reports />
               </ProtectedRoute>
             }
           />

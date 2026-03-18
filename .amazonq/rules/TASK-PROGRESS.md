@@ -8,7 +8,7 @@ This document tracks the development progress of the Budget Tracker application 
 
 ## 🎯 Current Task
 
-**Dashboard & Accounts Refactor** - Completed on 2026-03-17
+**Reporting & Interactive Insights Improvement** - Completed on 2026-03-18
 
 ---
 
@@ -66,7 +66,6 @@ This document tracks the development progress of the Budget Tracker application 
   - ✅ Category selection
   - ✅ Income/Expense/Withdrawal toggle
   - ✅ Date picker
-  - ⏸️ Receipt upload
   - ✅ Filter by card, wallet, category, date, payment method
   - ✅ Auto-update account balance (implemented in hooks)
 - 🚫 **Budget Management** - Removed (by User request)
@@ -90,21 +89,15 @@ This document tracks the development progress of the Budget Tracker application 
 
 ### Additional Features
 
-- ⏸️ **Data Visualization (Charts)** - Not started
-  - Income vs expenses chart
-  - Spending by category
-  - Spending by card/wallet
-  - Budget progress charts
-  - Goals progress visualization
+- ✅ **Data Visualization (Charts)** - Completed
+  - ✅ Income vs expenses chart
+  - ✅ Spending by category
+  - ✅ Filtering by specific card/wallet
+  - ✅ Filtering by timeframes (Month, Year, etc.)
 - ⏸️ **Export Functionality** - Not started
   - Export transactions to CSV
   - Export budget reports to PDF
   - Date range selection for exports
-- ⏸️ **Receipt Upload** - Not started
-  - Supabase Storage integration
-  - Image upload component
-  - Receipt preview
-  - Link receipts to transactions
 - ⏸️ **Real-time Sync** - Not started
   - Supabase real-time subscriptions
   - Live balance updates
@@ -135,6 +128,25 @@ This document tracks the development progress of the Budget Tracker application 
 
 ---
 ```
+
+### Reporting & Interactive Insights Improvement - 2026-03-18
+**Status:** ✅ Completed
+
+**Description:**
+Engineered a significant upgrade to the Reports visualization feature. Added interactive data filtering controls allowing segmentation by 'Account Provider' and 'Time Frame' and corrected the Pulse Check math logic.
+
+**Files Modified/Created:**
+- `src/pages/Reports.jsx` (Interactive filters, strict edge-case catching)
+- `src/components/reports/AllocationChart.jsx` (Palette update)
+- `src/components/reports/SpendingChart.jsx` (Added missing zero-data empty state component)
+- `src/utils/reportUtils.js` (Added more `date-fns` calculation helpers)
+
+**Outcome:**
+- Dashboard provides robust fallback logic avoiding `NaN%` displays on zero-income months.
+- Users can visualize data across dynamically generated account filters.
+- Complete visual continuity established with strict PennyWings styling properties.
+
+---
 
 ### Documentation & Deployment Setup - 2026-03-17
 **Status:** ✅ Completed
@@ -367,7 +379,7 @@ Implemented the end-to-end password reset flow. This included adding `updatePass
 ## 🔄 Active Development Phases
 
 1.  **Phase 4: Bank Cards & E-Wallets** - ✅ COMPLETED <!-- id: 19 -->
-2.  **Phase 5: Transactions Module** - ✅ COMPLETED (except receipt upload) <!-- id: 20 -->
+2.  **Phase 5: Transactions Module** - ✅ COMPLETED <!-- id: 20 -->
 3.  **Phase 7: Dashboard** - ✅ COMPLETED <!-- id: 21 -->
 4.  **Phase 8: Enhancements** - ⏸️ ON HOLD <!-- id: 22 -->
 
@@ -448,7 +460,7 @@ Implemented the end-to-end password reset flow. This included adding `updatePass
 -- bank_cards (id, user_id, card_name, card_type, last_four, balance, credit_limit, color, is_active, created_at, updated_at)
 -- e_wallets (id, user_id, wallet_name, wallet_type, account_identifier, balance, color, is_active, created_at, updated_at)
 -- categories (id, user_id, name, type, icon, color, is_default, created_at)
--- transactions (id, user_id, card_id, wallet_id, category_id, type, payment_method, amount, description, transaction_date, receipt_url, created_at, updated_at)
+-- transactions (id, user_id, card_id, wallet_id, category_id, type, payment_method, amount, description, transaction_date, created_at, updated_at)
 -- budgets (id, user_id, category_id, limit_amount, period, created_at, updated_at)
 -- goals (id, user_id, name, target_amount, current_amount, target_date, created_at, updated_at)
 ```
@@ -527,7 +539,6 @@ Implemented the end-to-end password reset flow. This included adding `updatePass
 - [x] Add category selection
 - [x] Create income/expense/withdrawal toggle
 - [x] Implement date picker
-- [ ] Add receipt upload functionality
 - [x] Build filter system (by card, wallet, category, date range, payment method)
 - [x] Auto-update account balance on transaction save
 - [x] Display transaction history per card/wallet
@@ -555,7 +566,6 @@ Implemented the end-to-end password reset flow. This included adding `updatePass
 - Payment method dropdown works correctly (Cash/Card/E-Wallet)
 - Account balances update automatically
 - Filtering works correctly
-- Receipt uploads functional
 - Pink-themed transaction UI
 
 ---
@@ -658,8 +668,6 @@ Implemented the end-to-end password reset flow. This included adding `updatePass
 - [ ] Create advanced data visualizations
 - [ ] Implement CSV export for transactions
 - [ ] Add PDF export for budget reports
-- [ ] Enhance receipt upload with Supabase Storage
-- [ ] Add image preview for receipts
 - [ ] Implement advanced filtering and search
 - [ ] Optimize responsive design for mobile
 - [ ] Add loading states and skeletons
@@ -716,7 +724,6 @@ Implemented the end-to-end password reset flow. This included adding `updatePass
 - Chart library: Chart.js or Recharts (to be decided in Phase 8)
 - Date handling: date-fns for formatting and manipulation
 - Form validation: Custom hooks or React Hook Form
-- File uploads: Supabase Storage for receipts
 - Real-time updates: Supabase real-time subscriptions
 
 ### Design Decisions

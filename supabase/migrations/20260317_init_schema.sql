@@ -61,7 +61,6 @@ CREATE TABLE IF NOT EXISTS public.transactions (
   amount DECIMAL(15, 2) NOT NULL,
   description TEXT,
   transaction_date DATE DEFAULT CURRENT_DATE NOT NULL,
-  receipt_url TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );

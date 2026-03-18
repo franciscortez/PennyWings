@@ -8,6 +8,7 @@ const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: 'bank' },
   { name: 'Accounts', href: '/accounts', icon: 'card' },
   { name: 'Transactions', href: '/transactions', icon: 'clock' },
+  { name: 'Reports', href: '/reports', icon: 'reports' },
 ]
 
 export default function Layout({ children }) {

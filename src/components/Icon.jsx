@@ -18,7 +18,8 @@ import {
   X,
   LogOut,
   ArrowLeft,
-  Banknote
+  Banknote,
+  BarChart2
 } from 'lucide-react';
 
 const icons = {
@@ -41,7 +42,8 @@ const icons = {
   x: X,
   logout: LogOut,
   arrowLeft: ArrowLeft,
-  cash: Banknote
+  cash: Banknote,
+  reports: BarChart2
 };
 
 const Icon = ({ name, color = 'currentColor', className = "w-6 h-6", size, ...props }) => {

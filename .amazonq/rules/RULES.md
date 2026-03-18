@@ -120,4 +120,4 @@ User Action → React Component → Supabase Client → PostgreSQL + RLS → Rea
 5. Transactions (Income/expense with account association)
 6. Goals (Financial planning features)
 7. Dashboard (Analytics and overview)
-8. Enhancements (Charts, export, receipts)
+8. Enhancements (Charts, export)
