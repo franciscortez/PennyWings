@@ -1,5 +1,6 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
 import Swal from 'sweetalert2'
+import { useSearchParams } from 'react-router-dom'
 import Layout from '../components/Layout'
 import TotalBalance from '../components/accounts/TotalBalance'
 import { useBankCards } from '../hooks/useBankCards'
@@ -14,14 +15,31 @@ import { motion as Motion, AnimatePresence } from 'motion/react'
 export default function Accounts() {
   const { cards, loading: loadingCards, addCard, updateCard, deleteCard } = useBankCards()
   const { wallets, loading: loadingWallets, addWallet, updateWallet, deleteWallet } = useEWallets()
-  
-  const [activeTab, setActiveTab] = useState('all')
+
+  const [searchParams, setSearchParams] = useSearchParams()
+  const tabFromUrl = searchParams.get('tab') || 'all'
+  const [activeTab, setActiveTab] = useState(
+    ['all', 'cards', 'wallets', 'cash'].includes(tabFromUrl) ? tabFromUrl : 'all'
+  )
   const [isWizardOpen, setIsWizardOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [editTarget, setEditTarget] = useState(null) // { account, type: 'card' | 'wallet' }
 
+  // Sync URL → state on navigation / back-button
+  useEffect(() => {
+    const tab = searchParams.get('tab')
+    if (tab && ['all', 'cards', 'wallets', 'cash'].includes(tab)) {
+      setActiveTab(tab)
+    }
+  }, [searchParams])
+
+  const handleTabChange = (tab) => {
+    setActiveTab(tab)
+    setSearchParams({ tab })
+  }
+
   const filteredCards = useMemo(() => {
-    return cards.filter(card => 
+    return cards.filter(card =>
       card.card_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (card.card_type || '').toLowerCase().includes(searchQuery.toLowerCase())
     )
@@ -29,18 +47,18 @@ export default function Accounts() {
 
   const filteredWallets = useMemo(() => {
     if (activeTab === 'cash') {
-      return wallets.filter(wallet => 
-        wallet.wallet_type === 'cash' &&
+      return wallets.filter(wallet =>
+        (wallet.wallet_type || '').toLowerCase() === 'cash' &&
         (wallet.wallet_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-         (wallet.wallet_type || '').toLowerCase().includes(searchQuery.toLowerCase()))
+          (wallet.wallet_type || '').toLowerCase().includes(searchQuery.toLowerCase()))
       )
     }
-    
-    // Regular e-wallets
-    return wallets.filter(wallet => 
-      wallet.wallet_type !== 'cash' &&
+
+    // Regular e-wallets (exclude cash)
+    return wallets.filter(wallet =>
+      (wallet.wallet_type || '').toLowerCase() !== 'cash' &&
       (wallet.wallet_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-       (wallet.wallet_type || '').toLowerCase().includes(searchQuery.toLowerCase()))
+        (wallet.wallet_type || '').toLowerCase().includes(searchQuery.toLowerCase()))
     )
   }, [wallets, searchQuery, activeTab])
 
@@ -162,7 +180,7 @@ export default function Accounts() {
 
   return (
     <Layout>
-      <Motion.div 
+      <Motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         className="mb-8"
@@ -171,13 +189,13 @@ export default function Accounts() {
         <p className="text-gray-500 dark:text-dark-muted">Manage your bank cards and digital wallets in one place.</p>
       </Motion.div>
 
-      <TotalBalance 
-        total={totalBalance} 
-        onAddClick={handleAddAccount} 
+      <TotalBalance
+        total={totalBalance}
+        onAddClick={handleAddAccount}
       />
 
       {/* Search & Tabs */}
-      <Motion.div 
+      <Motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.2 }}
@@ -187,22 +205,20 @@ export default function Accounts() {
           {['all', 'cards', 'wallets', 'cash'].map((tab) => (
             <button
               key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`flex items-center justify-center flex-1 md:flex-none gap-2 px-6 py-3 rounded-[1.2rem] font-bold transition-all snap-center ${
-                activeTab === tab
+              onClick={() => handleTabChange(tab)}
+              className={`flex items-center justify-center flex-1 md:flex-none gap-2 px-6 py-3 rounded-[1.2rem] font-bold transition-all snap-center ${activeTab === tab
                   ? 'bg-white dark:bg-dark-card text-pink-600 dark:text-pink-400 scale-105'
                   : 'text-gray-400 dark:text-dark-muted hover:text-pink-400'
-              }`}
+                }`}
             >
               <Icon name={tab === 'all' ? 'grid' : tab === 'cards' ? 'card' : tab === 'wallets' ? 'wallet' : 'cash'} color="currentColor" className="w-5 h-5" />
               {tab === 'all' ? 'All' : tab === 'cards' ? 'Cards' : tab === 'wallets' ? 'E-Wallet' : 'Cash'}
-              <span className={`ml-2 px-2 py-0.5 rounded-full text-[10px] ${
-                activeTab === tab ? 'bg-pink-100 dark:bg-dark-border text-pink-600 dark:text-pink-400' : 'bg-gray-100 dark:bg-dark-bg text-gray-400 dark:text-dark-muted'
-              }`}>
-                {tab === 'all' ? filteredCards.length + wallets.length : 
-                 tab === 'cards' ? filteredCards.length :
-                 tab === 'wallets' ? wallets.filter(w => w.wallet_type !== 'cash').length :
-                 wallets.filter(w => w.wallet_type === 'cash').length}
+              <span className={`ml-2 px-2 py-0.5 rounded-full text-[10px] ${activeTab === tab ? 'bg-pink-100 dark:bg-dark-border text-pink-600 dark:text-pink-400' : 'bg-gray-100 dark:bg-dark-bg text-gray-400 dark:text-dark-muted'
+                }`}>
+                {tab === 'all' ? filteredCards.length + wallets.length :
+                  tab === 'cards' ? filteredCards.length :
+                    tab === 'wallets' ? wallets.filter(w => (w.wallet_type || '').toLowerCase() !== 'cash').length :
+                      wallets.filter(w => (w.wallet_type || '').toLowerCase() === 'cash').length}
               </span>
             </button>
           ))}
@@ -238,14 +254,14 @@ export default function Accounts() {
                     </div>
                     <h3 className="text-xl font-bold text-gray-800 dark:text-dark-text">Bank Cards</h3>
                   </div>
-                  <CardList 
-                    cards={filteredCards} 
-                    loading={loadingCards} 
+                  <CardList
+                    cards={filteredCards}
+                    loading={loadingCards}
                     onEdit={handleEditCard}
                     onDelete={handleDeleteCard}
                   />
                 </section>
-                
+
                 <section>
                   <div className="flex items-center gap-3 mb-6">
                     <div className="w-8 h-8 rounded-lg bg-pink-100 dark:bg-dark-border flex items-center justify-center text-pink-600 dark:text-pink-400">
@@ -253,28 +269,28 @@ export default function Accounts() {
                     </div>
                     <h3 className="text-xl font-bold text-gray-800 dark:text-dark-text">Digital Wallets & Cash</h3>
                   </div>
-                  <WalletList 
-                    wallets={wallets.filter(w => 
+                  <WalletList
+                    wallets={wallets.filter(w =>
                       w.wallet_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                       (w.wallet_type || '').toLowerCase().includes(searchQuery.toLowerCase())
-                    )} 
-                    loading={loadingWallets} 
+                    )}
+                    loading={loadingWallets}
                     onEdit={handleEditWallet}
                     onDelete={handleDeleteWallet}
                   />
                 </section>
               </div>
             ) : activeTab === 'cards' ? (
-              <CardList 
-                cards={filteredCards} 
-                loading={loadingCards} 
+              <CardList
+                cards={filteredCards}
+                loading={loadingCards}
                 onEdit={handleEditCard}
                 onDelete={handleDeleteCard}
               />
             ) : (
-              <WalletList 
-                wallets={filteredWallets} 
-                loading={loadingWallets} 
+              <WalletList
+                wallets={filteredWallets}
+                loading={loadingWallets}
                 onEdit={handleEditWallet}
                 onDelete={handleDeleteWallet}
               />
@@ -284,11 +300,11 @@ export default function Accounts() {
       </div>
 
       {/* Unified Wizard */}
-      <AccountWizard 
+      <AccountWizard
         isOpen={isWizardOpen}
         onClose={() => setIsWizardOpen(false)}
         onSubmit={handleWizardSubmit}
-        hasCashAccount={wallets.some(w => w.wallet_type === 'cash')}
+        hasCashAccount={wallets.some(w => (w.wallet_type || '').toLowerCase() === 'cash')}
       />
 
       <EditAccountModal

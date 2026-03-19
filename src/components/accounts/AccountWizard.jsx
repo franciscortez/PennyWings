@@ -128,7 +128,6 @@ export default function AccountWizard({ isOpen, onClose, onSubmit, hasCashAccoun
       await onSubmit(submitType, finalData)
       onClose()
     } catch (err) {
-      console.error('Error creating account:', err)
       Toast.fire({
         icon: 'error',
         title: err.message || 'Failed to create account'
@@ -153,10 +152,10 @@ export default function AccountWizard({ isOpen, onClose, onSubmit, hasCashAccoun
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 10 }}
           transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-          className="bg-white dark:bg-dark-card w-full max-w-md rounded-[2.5rem] border border-pink-100 dark:border-dark-border overflow-hidden relative z-10 flex flex-col max-h-[90vh]"
+          className="bg-white dark:bg-dark-card w-full max-w-md rounded-[2.5rem] border border-pink-100 dark:border-dark-border overflow-hidden relative z-10 flex flex-col max-h-[95vh] md:max-h-[90vh]"
         >
           {/* Header */}
-          <div className="p-8 pb-4 flex justify-between items-center border-b border-pink-50 dark:border-dark-border">
+          <div className="p-6 sm:p-8 pb-4 flex justify-between items-center border-b border-pink-50 dark:border-dark-border">
             <div className="flex items-center gap-2">
               <AnimatePresence mode="wait">
                 {step > 1 && (
@@ -186,7 +185,7 @@ export default function AccountWizard({ isOpen, onClose, onSubmit, hasCashAccoun
           </div>
 
           {/* Scrollable Content Area */}
-          <div className="p-8 pt-4 overflow-y-auto flex-1 custom-scrollbar">
+          <div className="p-6 sm:p-8 pt-4 overflow-y-auto flex-1 custom-scrollbar">
             {/* Progress Bar */}
             <div className="flex gap-2 mb-8">
               {[1, 2, 3].map((s) => (
@@ -217,7 +216,7 @@ export default function AccountWizard({ isOpen, onClose, onSubmit, hasCashAccoun
                     className="space-y-6"
                   >
                     <label className="block text-xs font-black text-gray-400 dark:text-white uppercase tracking-widest ml-1">What kind of account?</label>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 gap-3 sm:gap-4">
                       {ACCOUNT_TYPES.filter(type => !(type.id === 'cash' && hasCashAccount)).map((type) => (
                         <Motion.button
                           whileHover={{ scale: 1.02 }}
@@ -225,18 +224,18 @@ export default function AccountWizard({ isOpen, onClose, onSubmit, hasCashAccoun
                           key={type.id}
                           type="button"
                           onClick={() => handleSelectType(type.id)}
-                          className={`flex flex-col items-center justify-center gap-3 p-6 border-2 rounded-[2rem] transition-all group text-center ${
+                          className={`flex flex-col items-center justify-center gap-2 sm:gap-3 p-4 sm:p-6 border-2 rounded-[2rem] transition-all group text-center ${
                             formData.type === type.id
                               ? 'border-pink-500 bg-pink-50 dark:bg-dark-bg scale-[1.02]'
                               : 'border-transparent bg-pink-50/50 dark:bg-dark-bg/50 hover:border-pink-200 dark:hover:border-dark-border hover:bg-white dark:hover:bg-dark-bg hover:scale-[1.02]'
                           }`}
                         >
-                          <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-transform ${
+                          <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center transition-transform ${
                             formData.type === type.id ? 'bg-pink-500 text-white' : 'bg-white dark:bg-dark-card text-pink-500'
                           }`}>
-                            <Icon name={type.icon === 'traditional' ? 'card' : type.icon} color="currentColor" />
+                            <Icon name={type.icon === 'traditional' ? 'card' : type.icon} color="currentColor" className="w-6 h-6 sm:w-8 sm:h-8" />
                           </div>
-                          <span className={`text-sm md:text-base font-bold ${
+                          <span className={`text-xs sm:text-base font-bold ${
                             formData.type === type.id ? 'text-pink-700' : 'text-gray-700'
                           }`}>{type.label}</span>
                         </Motion.button>
@@ -337,7 +336,7 @@ export default function AccountWizard({ isOpen, onClose, onSubmit, hasCashAccoun
                     <div className="text-center">
                       <label className="block text-xs font-black text-gray-400 dark:text-white uppercase tracking-[0.2em] mb-4">Initial Balance</label>
                       <div className="relative inline-block w-full">
-                        <span className="absolute left-6 top-1/2 -translate-y-1/2 text-4xl font-black text-pink-300">₱</span>
+                        <span className="absolute left-6 top-1/2 -translate-y-1/2 text-3xl sm:text-4xl font-black text-pink-300">₱</span>
                         <input
                           autoFocus
                           required
@@ -346,7 +345,7 @@ export default function AccountWizard({ isOpen, onClose, onSubmit, hasCashAccoun
                           placeholder="0.00"
                           value={formData.balance}
                           onChange={(e) => setFormData({ ...formData, balance: e.target.value })}
-                           className="w-full pl-16 pr-6 py-8 bg-pink-50/50 dark:bg-dark-bg border-2 border-pink-100 dark:border-dark-border rounded-[2.5rem] focus:border-pink-500 outline-none transition-all text-4xl font-black text-gray-800 dark:text-white text-center placeholder:text-pink-300 dark:placeholder:text-white"
+                           className="w-full pl-14 sm:pl-16 pr-6 py-6 sm:py-8 bg-pink-50/50 dark:bg-dark-bg border-2 border-pink-100 dark:border-dark-border rounded-[2.5rem] focus:border-pink-500 outline-none transition-all text-3xl sm:text-4xl font-black text-gray-800 dark:text-white text-center placeholder:text-pink-300 dark:placeholder:text-white"
                         />
                       </div>
                     </div>

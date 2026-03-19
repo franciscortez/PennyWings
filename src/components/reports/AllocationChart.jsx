@@ -30,9 +30,9 @@ export default React.memo(function AllocationChart({ data = [] }) {
         </p>
       </div>
 
-      <div className="flex-1 w-full relative z-10 min-h-0">
+      <div className="w-full relative z-10 h-[280px]">
         {hasData ? (
-          <ResponsiveContainer width="100%" height="100%" minWidth={100} minHeight={100}>
+          <ResponsiveContainer width="100%" height={280} minWidth={100} debounce={100}>
             <PieChart>
               <Pie
                 data={data}

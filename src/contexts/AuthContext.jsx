@@ -18,13 +18,13 @@ export function AuthProvider({ children }) {
       if (error) {
         // PGRST116 = row not found: profile may not exist yet (DB trigger may be pending)
         if (error.code !== "PGRST116") {
-          console.error("Error fetching profile:", error);
+          // Silent handling for now as requested
         }
       } else {
         setProfile(data);
       }
     } catch (err) {
-      console.error("Unexpected error fetching profile:", err);
+      // Silent handling
     }
   };
 
@@ -131,7 +131,6 @@ export function AuthProvider({ children }) {
       await signOut();
       return { data, success: true };
     } catch (error) {
-      console.error("Error deleting account:", error);
       return { error };
     }
   };

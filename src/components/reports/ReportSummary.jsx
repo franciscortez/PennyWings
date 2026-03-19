@@ -30,7 +30,7 @@ export default React.memo(function ReportSummary({
       color: "text-pink-500",
       gradient: "from-pink-50 to-white",
       iconBg: "bg-pink-500",
-      blob: "bg-pink-200/30",
+      blob: "bg-pink-200/30", 
     },
   ];
 

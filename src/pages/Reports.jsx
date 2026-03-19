@@ -64,7 +64,6 @@ export default function Reports() {
 
   useEffect(() => {
     if (fetchError) {
-      console.error('Error fetching report data:', fetchError);
       Swal.fire({
         icon: 'error',
         title: 'Oops...',

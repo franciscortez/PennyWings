@@ -132,6 +132,22 @@ Implemented a robust "Transfer" feature allowing users to move funds between acc
 
 ---
  
+### Cash Deposits & Transfer UI Unlocked - 2026-03-19
+**Status:** ✅ Completed
+
+**Description:**
+Enabled "Cash to Card" (Deposits) and "Card to Cash" (Withdrawals) uniformly by unlocking `Cash` as a fully valid `payment_method` in both the Source and Destination dropdowns within the `TransactionForm`. This prevents internal money movements from artificially inflating Income or Expense reports. 
+
+**Files Modified/Created:**
+- `src/components/transactions/TransactionForm.jsx` (Removed cash UI restrictions, mapped destination `cashWallet.id` payload)
+- `src/hooks/useTransactions.js` (Reviewed update mutation recovery logic, confirmed mathematical soundness for reverts)
+
+**Outcome:**
+- Users can natively use the "Transfer" tab to deposit cash to a bank card or move e-wallet funds to physical cash.
+- Reporting numbers remain perfectly accurate because transfers do not trigger `income` or `expense` aggregations.
+
+---
+ 
 ### [Task Name] - [Date]
 ```
  

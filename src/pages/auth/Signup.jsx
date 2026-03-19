@@ -126,7 +126,6 @@ export default function Signup() {
         title: 'Unexpected Error',
         text: 'Please try again.'
       });
-      console.error(err);
     } finally {
       setLoading(false);
     }

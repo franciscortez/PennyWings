@@ -99,15 +99,15 @@ export default function EditAccountModal({ account, type, isOpen, onClose, onSav
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-pink-900/20 backdrop-blur-sm">
-      <div className="bg-white dark:bg-dark-card w-full max-w-md rounded-[2.5rem] border border-pink-100 dark:border-dark-border overflow-hidden animate-in fade-in zoom-in duration-300 flex flex-col max-h-[90vh]">
-        <div className="p-8 pb-4 flex justify-between items-center border-b border-pink-50 dark:border-dark-border">
+      <div className="bg-white dark:bg-dark-card w-full max-w-md rounded-[2.5rem] border border-pink-100 dark:border-dark-border overflow-hidden animate-in fade-in zoom-in duration-300 flex flex-col max-h-[95vh] md:max-h-[90vh]">
+        <div className="p-6 sm:p-8 pb-4 flex justify-between items-center border-b border-pink-50 dark:border-dark-border">
           <h2 className="text-2xl font-black text-gray-800 dark:text-white tracking-tight">{title}</h2>
           <button onClick={onClose} className="p-2 hover:bg-pink-50 dark:hover:bg-dark-bg rounded-full text-gray-400 dark:text-dark-muted transition-colors">
             <Icon name="x" color="currentColor" className="w-6 h-6" />
           </button>
         </div>
 
-        <div className="p-8 pt-4 overflow-y-auto flex-1 custom-scrollbar">
+        <div className="p-6 sm:p-8 pt-4 overflow-y-auto flex-1 custom-scrollbar">
 
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Name */}
@@ -184,7 +184,7 @@ export default function EditAccountModal({ account, type, isOpen, onClose, onSav
                   placeholder="0.00"
                   value={formData.balance}
                   onChange={(e) => setFormData({ ...formData, balance: e.target.value })}
-                  className="w-full pl-10 pr-6 py-4 bg-pink-50/50 dark:bg-dark-bg border-2 border-pink-100 dark:border-dark-border rounded-2xl focus:border-pink-500 outline-none transition-all text-xl font-black text-gray-800 dark:text-white placeholder:text-pink-300 dark:placeholder:text-white"
+                  className="w-full pl-10 pr-6 py-4 bg-pink-50/50 dark:bg-dark-bg border-2 border-pink-100 dark:border-dark-border rounded-2xl focus:border-pink-500 outline-none transition-all text-lg sm:text-xl font-black text-gray-800 dark:text-white placeholder:text-pink-300 dark:placeholder:text-white"
                 />
               </div>
             </div>
