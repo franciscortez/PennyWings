@@ -22,6 +22,20 @@ const staggerContainer = {
   }
 };
 
+const Toast = Swal.mixin({
+  toast: true,
+  position: 'top-end',
+  showConfirmButton: false,
+  timer: 2000,
+  timerProgressBar: false,
+  background: '#ffffff',
+  color: '#1f2937',
+  iconColor: '#ec4899',
+  customClass: {
+    popup: 'rounded-2xl shadow-xl border border-pink-50'
+  }
+});
+
 export default function Transactions() {
   const [searchParams, setSearchParams] = useSearchParams();
   
@@ -49,18 +63,18 @@ export default function Transactions() {
   const [isFormOpen, setIsFormOpen] = useState(false);
 
   const handleAddTransaction = async (data) => {
-    const { error } = await addTransaction(data);
-    if (error) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Transaction Failed',
-        text: error,
-        confirmButtonColor: '#EC4899',
-        customClass: {
-          popup: 'rounded-[2.5rem]',
-          confirmButton: 'rounded-2xl px-8 py-3'
-        }
+    try {
+      await addTransaction(data);
+      Toast.fire({
+        icon: 'success',
+        title: 'Transaction recorded! ✨'
       });
+    } catch (error) {
+      Toast.fire({
+        icon: 'error',
+        title: error.message || 'Failed to save transaction'
+      });
+      throw error; // Re-throw to keep TransactionForm modal open
     }
   };
 
@@ -80,17 +94,16 @@ export default function Transactions() {
       }
     }).then(async (result) => {
       if (result.isConfirmed) {
-        const { error } = await deleteTransaction(tx);
-        if (error) {
-          Swal.fire({
+        try {
+          await deleteTransaction(tx);
+          Toast.fire({
+            icon: 'success',
+            title: 'Deleted!'
+          });
+        } catch (error) {
+          Toast.fire({
             icon: 'error',
-            title: 'Oops...',
-            text: error,
-            confirmButtonColor: '#EC4899',
-            customClass: {
-              popup: 'rounded-[2.5rem]',
-              confirmButton: 'rounded-2xl px-8 py-3'
-            }
+            title: error.message || 'Delete failed'
           });
         }
       }
