@@ -13,17 +13,8 @@ const TX_SELECT = `
   to_wallet:e_wallets!transactions_to_wallet_id_fkey(wallet_name, color)
 `;
 
-// Helper: atomically update a bank card or wallet balance by a delta
-const applyBalanceDelta = async (cardId, walletId, delta) => {
-  if (cardId) {
-    const { error } = await supabase.rpc("update_card_balance", { p_id: cardId, p_delta: delta });
-    if (error) throw error;
-  } else if (walletId) {
-    const { error } = await supabase.rpc("update_wallet_balance", { p_id: walletId, p_delta: delta });
-    if (error) throw error;
-  }
-};
-
+// Helper: Get Cash Wallet ID (needed for withdrawal special case if still handled on client, 
+// but we moved cash logic to RPC, so this is now redundant for balance updates but might be useful for other things)
 const getCashWalletId = async (userId) => {
   const { data, error } = await supabase
     .from("e_wallets")
@@ -107,7 +98,7 @@ export const useTransactions = ({ page = 1, pageSize = 10, search = '', type = '
       const amount = Number(transactionData.amount);
       const isDeduction = transactionData.type === "expense" || transactionData.type === "withdrawal" || transactionData.type === "transfer";
 
-      // Validate balance for deductions
+      // Validate balance for deductions (Client-side fast fail)
       if (isDeduction) {
         const currentBalance = await getAccountBalance(transactionData.card_id, transactionData.wallet_id);
         if (amount > currentBalance) {
@@ -115,34 +106,20 @@ export const useTransactions = ({ page = 1, pageSize = 10, search = '', type = '
         }
       }
 
-      const { data, error } = await supabase
-        .from("transactions")
-        .insert([{ ...transactionData, user_id: user?.id }])
-        .select()
-        .single();
+      const { data, error } = await supabase.rpc("process_transaction", {
+        p_type: transactionData.type,
+        p_amount: amount,
+        p_description: transactionData.description,
+        p_transaction_date: transactionData.transaction_date,
+        p_category_id: transactionData.category_id,
+        p_payment_method: transactionData.payment_method,
+        p_card_id: transactionData.card_id,
+        p_wallet_id: transactionData.wallet_id,
+        p_to_card_id: transactionData.to_card_id,
+        p_to_wallet_id: transactionData.to_wallet_id
+      });
 
       if (error) throw error;
-
-      // Update account balance
-      const updateAmount = Number(data.amount);
-
-      if (data.type === "transfer") {
-        // Transfer logic: Deduct from source, add to destination
-        await applyBalanceDelta(data.card_id, data.wallet_id, -updateAmount);
-        await applyBalanceDelta(data.to_card_id, data.to_wallet_id, updateAmount);
-      } else {
-        const delta = data.type === "income" ? updateAmount : -updateAmount;
-        await applyBalanceDelta(data.card_id, data.wallet_id, delta);
-
-        // Special handling for withdrawal: Add to cash
-        if (data.type === "withdrawal") {
-          const cashWalletId = await getCashWalletId(user.id);
-          if (cashWalletId) {
-            await applyBalanceDelta(null, cashWalletId, amount);
-          }
-        }
-      }
-
       return data;
     },
     onSuccess: () => {
@@ -152,32 +129,11 @@ export const useTransactions = ({ page = 1, pageSize = 10, search = '', type = '
 
   const deleteMutation = useMutation({
     mutationFn: async (transaction) => {
-      const { error } = await supabase
-        .from("transactions")
-        .delete()
-        .eq("id", transaction.id);
+      const { error } = await supabase.rpc("delete_transaction", {
+        p_id: transaction.id
+      });
 
       if (error) throw error;
-
-      // Revert account balance
-      const amount = Number(transaction.amount);
-
-      if (transaction.type === "transfer") {
-        // Revert transfer: Add back to source, deduct from destination
-        await applyBalanceDelta(transaction.card_id, transaction.wallet_id, amount);
-        await applyBalanceDelta(transaction.to_card_id, transaction.to_wallet_id, -amount);
-      } else {
-        const revertDelta = transaction.type === "income" ? -amount : amount;
-        await applyBalanceDelta(transaction.card_id, transaction.wallet_id, revertDelta);
-
-        // Revert cash side for withdrawal
-        if (transaction.type === "withdrawal") {
-          const cashWalletId = await getCashWalletId(user.id);
-          if (cashWalletId) {
-            await applyBalanceDelta(null, cashWalletId, -amount);
-          }
-        }
-      }
     },
     onSuccess: () => {
       invalidateAll();
@@ -185,63 +141,29 @@ export const useTransactions = ({ page = 1, pageSize = 10, search = '', type = '
   });
 
   const updateMutation = useMutation({
-    mutationFn: async ({ id, updates, oldTransaction }) => {
-      // For simplicity, we'll revert the old transaction balance and apply the new one
-      // This is safer than calculating net deltas across multiple tables/types
-
-      // 1. Revert Old Transaction
-      const oldAmount = Number(oldTransaction.amount);
-      if (oldTransaction.type === "transfer") {
-        await applyBalanceDelta(oldTransaction.card_id, oldTransaction.wallet_id, oldAmount);
-        await applyBalanceDelta(oldTransaction.to_card_id, oldTransaction.to_wallet_id, -oldAmount);
-      } else {
-        const revertDelta = oldTransaction.type === "income" ? -oldAmount : oldAmount;
-        await applyBalanceDelta(oldTransaction.card_id, oldTransaction.wallet_id, revertDelta);
-        if (oldTransaction.type === "withdrawal") {
-          const cashId = await getCashWalletId(user.id);
-          if (cashId) await applyBalanceDelta(null, cashId, -oldAmount);
-        }
+    mutationFn: async ({ id, updates }) => {
+      // Safety check: ensure all required fields are present to avoid overwriting with NULL
+      const requiredFields = ['type', 'amount', 'transaction_date', 'category_id', 'payment_method'];
+      const missing = requiredFields.filter(f => updates[f] === undefined);
+      if (missing.length > 0) {
+        throw new Error(`Missing required fields for update: ${missing.join(', ')}`);
       }
 
-      // 2. Perform Update
-      const { data: updatedTx, error: updateError } = await supabase
-        .from("transactions")
-        .update(updates)
-        .eq("id", id)
-        .select()
-        .single();
+      const { error } = await supabase.rpc("update_transaction", {
+        p_id: id,
+        p_type: updates.type,
+        p_amount: Number(updates.amount),
+        p_description: updates.description,
+        p_transaction_date: updates.transaction_date,
+        p_category_id: updates.category_id,
+        p_payment_method: updates.payment_method,
+        p_card_id: updates.card_id,
+        p_wallet_id: updates.wallet_id,
+        p_to_card_id: updates.to_card_id,
+        p_to_wallet_id: updates.to_wallet_id
+      });
 
-      if (updateError) {
-        // Re-apply old balances if update fails (Best effort recovery)
-        if (oldTransaction.type === "transfer") {
-          await applyBalanceDelta(oldTransaction.card_id, oldTransaction.wallet_id, -oldAmount);
-          await applyBalanceDelta(oldTransaction.to_card_id, oldTransaction.to_wallet_id, oldAmount);
-        } else {
-          const delta = oldTransaction.type === "income" ? oldAmount : -oldAmount;
-          await applyBalanceDelta(oldTransaction.card_id, oldTransaction.wallet_id, delta);
-          if (oldTransaction.type === "withdrawal") {
-            const cashId = await getCashWalletId(user.id);
-            if (cashId) await applyBalanceDelta(null, cashId, oldAmount);
-          }
-        }
-        throw updateError;
-      }
-
-      // 3. Apply New Balances
-      const newAmount = Number(updatedTx.amount);
-      if (updatedTx.type === "transfer") {
-        await applyBalanceDelta(updatedTx.card_id, updatedTx.wallet_id, -newAmount);
-        await applyBalanceDelta(updatedTx.to_card_id, updatedTx.to_wallet_id, newAmount);
-      } else {
-        const newDelta = updatedTx.type === "income" ? newAmount : -newAmount;
-        await applyBalanceDelta(updatedTx.card_id, updatedTx.wallet_id, newDelta);
-        if (updatedTx.type === "withdrawal") {
-          const cashId = await getCashWalletId(user.id);
-          if (cashId) await applyBalanceDelta(null, cashId, newAmount);
-        }
-      }
-
-      return updatedTx;
+      if (error) throw error;
     },
     onSuccess: () => {
       invalidateAll();
@@ -273,7 +195,7 @@ export const useTransactions = ({ page = 1, pageSize = 10, search = '', type = '
     loading: transactionsQuery.isLoading || addMutation.isPending || deleteMutation.isPending || updateMutation.isPending,
     error: transactionsQuery.error || addMutation.error || deleteMutation.error || updateMutation.error,
     addTransaction: addMutation.mutateAsync,
-    updateTransaction: (id, updates, oldTransaction) => updateMutation.mutateAsync({ id, updates, oldTransaction }),
+    updateTransaction: (id, updates) => updateMutation.mutateAsync({ id, updates }),
     deleteTransaction: deleteMutation.mutateAsync,
     refreshTransactions: () => queryClient.invalidateQueries({ queryKey: ["transactions", user?.id] }),
   };

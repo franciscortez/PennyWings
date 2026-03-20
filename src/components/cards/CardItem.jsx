@@ -2,6 +2,7 @@ import React from 'react'
 import Icon from '../Icon'
 import { motion as Motion } from 'motion/react'
 import { useTheme } from '../../contexts/ThemeContext'
+import CardChip from './CardChip'
 
 export default function CardItem({ card, onEdit, onDelete }) {
   const { theme } = useTheme()
@@ -23,37 +24,40 @@ export default function CardItem({ card, onEdit, onDelete }) {
           color: card.text_color || '#FFFFFF'
         }}
       >
-        {/* Card Pattern/Decoration */}
-        <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full translate-x-10 translate-y-[-10px] blur-2xl"></div>
-        <div className="absolute bottom-0 left-0 w-24 h-24 bg-black/10 rounded-full translate-x-[-10px] translate-y-10 blur-xl"></div>
+        {/* Card Pattern/Decoration - More professional SVG pattern */}
+        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: `radial-gradient(circle at 1px 1px, white 1px, transparent 0)`, backgroundSize: '16px 16px' }}></div>
+        <div className="absolute top-0 right-0 w-32 h-32 bg-white/20 rounded-full translate-x-10 translate-y-[-20px] blur-3xl"></div>
         
-        <div className="absolute top-4 right-6 opacity-20">
-          <Icon name="bank" color="currentColor" className="w-12 h-12" />
+        <div className="absolute top-4 right-6 opacity-30">
+          <Icon name="bank" color="currentColor" className="w-10 h-10" />
         </div>
 
         <div className="relative z-10 h-full flex flex-col justify-between">
           <div className="flex justify-between items-start">
             <div>
-              <p className="text-[10px] font-black uppercase tracking-widest opacity-60 mb-1">{card.bank_name || 'Bank'}</p>
-              <h3 className="text-xl font-bold tracking-tight">
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] opacity-70 mb-1">{card.card_type === 'credit' ? 'Premium Credit' : 'Bank Debit'}</p>
+              <h3 className="text-xl font-bold tracking-tight truncate max-w-[140px]">
                 {card.card_name}
               </h3>
             </div>
-            <Motion.div 
-              whileHover={{ rotate: 15 }}
-              className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center border border-white/30 p-2"
-            >
-              <Icon name="card" color="currentColor" className="w-6 h-6" />
-            </Motion.div>
+            
+            {/* Real Card Chip */}
+            <CardChip className="w-10 h-8 mt-1" />
           </div>
           
           <div className="mt-auto">
-            <p className="text-xs font-mono tracking-widest mb-1 opacity-60">•••• •••• •••• {card.last_four || '0000'}</p>
+            <p className="text-sm font-mono tracking-[0.3em] mb-2 opacity-80">•••• •••• •••• {card.last_four || '0000'}</p>
             <div className="flex justify-between items-end">
-              <p className="text-2xl font-black tracking-tight">
-                ₱{Number(card.balance || 0).toLocaleString('en-PH', { minimumFractionDigits: 2 })}
-              </p>
-              <span className="opacity-40 text-[8px] font-black uppercase tracking-tighter">Debit Card</span>
+              <div>
+                <p className="text-[10px] opacity-70 uppercase font-bold tracking-widest mb-1">Balance</p>
+                <p className="text-2xl font-black tracking-tight">
+                  ₱{Number(card.balance || 0).toLocaleString('en-PH', { minimumFractionDigits: 2 })}
+                </p>
+              </div>
+              <div className="flex flex-col items-end">
+                <Icon name="card" color="currentColor" className="w-8 h-8 opacity-20 mb-1" />
+                <span className="opacity-60 text-[8px] font-black uppercase tracking-widest">VISA / MC</span>
+              </div>
             </div>
           </div>
         </div>

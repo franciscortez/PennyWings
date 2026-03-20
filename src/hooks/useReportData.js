@@ -13,7 +13,7 @@ export const useReportData = (dateRange) => {
         .from('transactions')
         .select(`
           id, type, amount, description, transaction_date,
-          categories (
+          category:categories (
             name
           ),
           bank_cards:bank_cards!transactions_card_id_fkey (

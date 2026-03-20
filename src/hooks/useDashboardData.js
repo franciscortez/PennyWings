@@ -13,7 +13,7 @@ export const useDashboardData = (txLimit = 5) => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('bank_cards')
-        .select('id, card_name, balance, color, text_color')
+        .select('id, card_name, card_type, balance, color, text_color')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
       if (error) throw error
@@ -28,7 +28,7 @@ export const useDashboardData = (txLimit = 5) => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('e_wallets')
-        .select('id, wallet_name, balance, color, text_color')
+        .select('id, wallet_name, wallet_type, balance, color, text_color')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
       if (error) throw error
@@ -93,23 +93,22 @@ export const useDashboardData = (txLimit = 5) => {
   // Set up real-time subscriptions for cache invalidation
   useEffect(() => {
     if (user) {
-      const channels = [
-        supabase.channel('dashboard_cards').on('postgres_changes', { event: '*', schema: 'public', table: 'bank_cards', filter: `user_id=eq.${user.id}` }, () => {
+      const channel = supabase
+        .channel('dashboard_changes')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'bank_cards', filter: `user_id=eq.${user.id}` }, () => {
           queryClient.invalidateQueries({ queryKey: ['bank_cards', user.id] })
-        }),
-        supabase.channel('dashboard_wallets').on('postgres_changes', { event: '*', schema: 'public', table: 'e_wallets', filter: `user_id=eq.${user.id}` }, () => {
+        })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'e_wallets', filter: `user_id=eq.${user.id}` }, () => {
           queryClient.invalidateQueries({ queryKey: ['e_wallets', user.id] })
-        }),
-        supabase.channel('dashboard_tx').on('postgres_changes', { event: '*', schema: 'public', table: 'transactions', filter: `user_id=eq.${user.id}` }, () => {
+        })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'transactions', filter: `user_id=eq.${user.id}` }, () => {
           queryClient.invalidateQueries({ queryKey: ['recent_transactions', user.id] })
           queryClient.invalidateQueries({ queryKey: ['monthly_stats', user.id] })
         })
-      ]
-
-      channels.forEach(channel => channel.subscribe())
-
+        .subscribe();
+      
       return () => {
-        channels.forEach(channel => supabase.removeChannel(channel))
+        supabase.removeChannel(channel);
       }
     }
   }, [user, queryClient])
@@ -121,6 +120,11 @@ export const useDashboardData = (txLimit = 5) => {
     monthlyStats: statsQuery.data || { income: 0, expenses: 0 },
     loading: cardsQuery.isLoading || walletsQuery.isLoading || transactionsQuery.isLoading || statsQuery.isLoading,
     error: cardsQuery.error || walletsQuery.error || transactionsQuery.error || statsQuery.error,
-    refresh: () => queryClient.invalidateQueries({ queryKey: [user?.id] })
+    refresh: () => {
+      queryClient.invalidateQueries({ queryKey: ['bank_cards', user?.id] });
+      queryClient.invalidateQueries({ queryKey: ['e_wallets', user?.id] });
+      queryClient.invalidateQueries({ queryKey: ['recent_transactions', user?.id] });
+      queryClient.invalidateQueries({ queryKey: ['monthly_stats', user?.id] });
+    }
   }
 }

@@ -77,6 +77,7 @@ export default function EditAccountModal({ account, type, isOpen, onClose, onSav
         }
         : {
           wallet_name: formData.wallet_name,
+          wallet_type: formData.wallet_type,
           balance: Number(formData.balance),
           account_identifier: formData.account_identifier,
           color: formData.color,
