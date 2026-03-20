@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react'
+import { lazy, Suspense, useEffect } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClient } from './lib/queryClient'
@@ -18,6 +18,7 @@ const Transactions = lazy(() => import('./pages/Transactions'))
 const Accounts = lazy(() => import('./pages/Accounts'))
 const Profile = lazy(() => import('./pages/Profile'))
 const Reports = lazy(() => import('./pages/Reports'))
+
 
 export default function App() {
   return (

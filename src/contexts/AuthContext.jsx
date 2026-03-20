@@ -78,7 +78,6 @@ export function AuthProvider({ children }) {
       provider: "google",
       options: {
         redirectTo: `${window.location.origin}/dashboard`,
-        skipBrowserRedirect: true,
       },
     });
     return { data, error };
