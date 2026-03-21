@@ -18,6 +18,9 @@ const Transactions = lazy(() => import('./pages/Transactions'))
 const Accounts = lazy(() => import('./pages/Accounts'))
 const Profile = lazy(() => import('./pages/Profile'))
 const Reports = lazy(() => import('./pages/Reports'))
+const Monitoring = lazy(() => import('./pages/Monitoring'))
+
+
 
 
 export default function App() {
@@ -74,6 +77,16 @@ export default function App() {
                     </ProtectedRoute>
                   }
                 />
+                <Route
+                  path="/monitoring"
+                  element={
+                    <ProtectedRoute>
+                      <Monitoring />
+                    </ProtectedRoute>
+                  }
+                />
+
+
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
             </Suspense>

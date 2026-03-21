@@ -68,17 +68,16 @@ This document tracks the development progress of the Budget Tracker application 
   - ✅ Date picker
   - ✅ Filter by card, wallet, category, date, payment method
   - ✅ Auto-update account balance (implemented in hooks)
-- 🚫 **Budget Management** - Removed (by User request)
-  - Budget setup per category
-  - Budget vs actual spending visualization
-  - Progress bars with color indicators
-  - Monthly budget cycles
-  - Budget alerts/warnings
-- ⏸️ **Goals Tracking** - Not started
-  - Create savings goals
-  - Track progress toward goals
-  - Target date management
-  - Visual progress indicators
+- ✅ **Budget Management** - Completed
+  - ✅ Budget setup per category (Filtered for Expenses)
+  - ✅ Budget vs actual spending visualization
+  - ✅ Progress bars with color indicators
+  - ✅ Monthly budget cycles
+- ✅ **Goals Tracking** - Completed
+  - ✅ Create savings goals (Automated via Linking)
+  - ✅ Track progress toward goals
+  - ✅ Target date management
+  - ✅ Visual progress indicators
 - ✅ **Dashboard UI** - Completed
   - ✅ Financial overview cards (Income, Expenses, Net Worth)
   - ✅ Total balance across all cards and e-wallets
@@ -112,6 +111,56 @@ This document tracks the development progress of the Budget Tracker application 
 
 ## 📝 Task History
 
+### UI Refinements & Layout Optimization - 2026-03-21
+**Status:** ✅ Completed
+
+**Description:**
+Addressed mobile usability issues by fixing overlapping text in the bottom navigation bar (truncation and responsive scaling) and improving the responsiveness of the `Target Date` input in the `GoalForm`. Standardized the dashboard status cards to show real-time average progress for budgets and goals using live data hooks.
+
+**Files Modified/Created:**
+- `src/components/Layout.jsx` (Responsive navigation and icon size tweaks)
+- `src/pages/Dashboard.jsx` (Integrated `useGoals` and `useBudgetStats` for real-time progress)
+- `src/components/goals/GoalForm.jsx` (Target Date input refinement)
+- `src/pages/Monitoring.jsx` (Reordered tabs to show Goals first by default)
+
+**Outcome:**
+- A more professional and stable mobile UI with no overlapping text.
+- Dashboard stats provide immediate, accurate feedback on financial progress.
+- Forms are easier to use on small touchscreens.
+
+---
+
+### Automated Goal Tracking via Linked Accounts - 2026-03-21
+**Status:** ✅ Completed
+
+**Description:**
+Implemented Goal automation by linking goals directly to Accounts (Bank Cards or E-Wallets). When an account is linked, the Goal's `current_amount` dynamically mirrors the live balance of the linked account. This allows the new `Transfer` feature to seamlessly update Goal progress automatically without manual ledgers.
+
+**Files Modified/Created:**
+- `Supabase SQL` (Added `linked_card_id` and `linked_wallet_id` to `goals` table)
+- `src/components/goals/GoalForm.jsx` (Redesigned with Linking options)
+- `src/hooks/useGoals.js` (Dynamically maps live card/wallet balances into goals)
+- `src/components/goals/GoalItem.jsx` (Added visual "Linked" badge)
+
+**Outcome:**
+- Infinite flexibility for goal savings without disjointed data.
+- Removes manual data entry requirements for goal contributions.
+
+---
+### Monitoring Form Backdrop Blur Fix - 2026-03-21
+**Status:** ✅ Completed
+
+**Description:**
+Fixed a CSS context issue in `Monitoring.jsx` where the background blur for `BudgetForm` and `GoalForm` did not cover the entire viewport. The forms were previously nested inside `AnimatedPage`, which created a new CSS stacking context via `transform`, trapping the `fixed` positioning. Moving the modals to sit directly inside `<Layout>` resolved the issue, making the overlay accurately match `TransactionForm.jsx`.
+
+**Files Modified/Created:**
+- `src/pages/Monitoring.jsx` (Extracted forms from transformed wrapper)
+
+**Outcome:**
+- Form background blurs now correctly cover the whole screen.
+- Enhanced aesthetic consistency across all application modals.
+
+---
 ### Transfer Feature Implementation - 2026-03-19
 **Status:** ✅ Completed
 
@@ -148,8 +197,25 @@ Enabled "Cash to Card" (Deposits) and "Card to Cash" (Withdrawals) uniformly by 
 
 ---
  
-### [Task Name] - [Date]
-```
+### Monitoring Module & Responsive Forms Optimization - 2026-03-21
+**Status:** ✅ Completed
+
+**Description:**
+Combined the Budgets and Goals functionality into a unified `Monitoring.jsx` page with a tabbed interface. Standardized the responsive form design for `BudgetForm.jsx` and `GoalForm.jsx` to match the premium styling of `TransactionForm.jsx` (utilizing correct z-indices, scrolling behavior, and modal scales). Updated delete actions to use the centralized `getConfirm` preset utility.
+
+**Files Modified/Created:**
+- `src/pages/Monitoring.jsx` (New unified view)
+- `src/components/budgets/BudgetForm.jsx` (Responsive redesign)
+- `src/components/goals/GoalForm.jsx` (Responsive redesign)
+- `src/components/budgets/BudgetItem.jsx` (Mobile UI)
+- `src/components/goals/GoalItem.jsx` (Mobile UI)
+
+**Outcome:**
+- Users can switch between Budgets and Goals in one centralized tracking hub.
+- All forms behave perfectly on mobile with internal scrolling and proper overlay dismissals.
+- Delete confirmations share consistent theming and text defaults via `confirmPresets`.
+
+---
  
 ### Pagination Error Handling & Safety Checks - 2026-03-19
 **Status:** ✅ Completed
@@ -676,23 +742,23 @@ Implemented the end-to-end password reset flow. This included adding `updatePass
 
 ---
 
-### Phase 6: Budgets & Goals ⏸️
+### Phase 6: Budgets & Goals ✅ COMPLETED
 
 **Goal:** Implement budget tracking and savings goals
 
 **Tasks:**
 
-- [ ] Create budgets page with category limits
-- [ ] Build budget setup form
-- [ ] Implement budget vs actual spending calculation
-- [ ] Create progress bars with color indicators (green/red)
-- [ ] Add monthly budget cycle management
-- [ ] Create goals page
-- [ ] Build goal creation form
-- [ ] Implement goal progress tracking
-- [ ] Add target date management
-- [ ] Create visual progress indicators
-- [ ] Add budget alerts/warnings
+- [x] Create budgets page with category limits
+- [x] Build budget setup form (Expense filtering)
+- [x] Implement budget vs actual spending calculation
+- [x] Create progress bars with color indicators
+- [x] Add monthly budget cycle management
+- [x] Create goals page (Monitoring tab)
+- [x] Build goal creation form (Automated Linking)
+- [x] Implement goal progress tracking (Live data hooks)
+- [x] Add target date management
+- [x] Create visual progress indicators
+- [x] Add budget alerts/warnings
 
 **Files to Create:**
 
@@ -732,10 +798,10 @@ Implemented the end-to-end password reset flow. This included adding `updatePass
 - [x] Add bank cards and e-wallets quick view widget
 - [x] Show recent transactions with card/wallet info
 - [x] Display budget progress indicators
-- [ ] Show goals progress
-- [ ] Create monthly spending by card/wallet chart
-- [ ] Add income vs expenses chart
-- [ ] Implement spending by category visualization
+- [x] Show goals progress (Real-time averages)
+- [x] Create monthly spending by card/wallet chart
+- [x] Add income vs expenses chart
+- [x] Implement spending by category visualization
 - [ ] Add date range selector for analytics
 
 **Files to Create:**
@@ -770,18 +836,19 @@ Implemented the end-to-end password reset flow. This included adding `updatePass
 
 **Tasks:**
 
-- [ ] Integrate chart library (Chart.js or Recharts)
-- [ ] Create advanced data visualizations
-- [ ] Implement CSV export for transactions
-- [ ] Add PDF export for budget reports
-- [ ] Implement advanced filtering and search
-- [ ] Optimize responsive design for mobile
-- [ ] Add loading states and skeletons
-- [ ] Implement error boundaries
-- [ ] Add accessibility improvements (ARIA labels, keyboard nav)
-- [ ] Optimize performance (code splitting, lazy loading)
-- [ ] Add animations and transitions
-- [ ] Implement dark mode with pink/mauve tones
+- [x] Integrate chart library (Chart.js or Recharts)
+- [x] Create advanced data visualizations
+- [x] Implement CSV export for transactions
+- [x] Add PDF export for budget reports
+- [x] Implement advanced filtering and search
+- [x] Optimize responsive design for mobile
+- [x] Add loading states and skeletons
+- [x] Implement error boundaries
+- [x] Add accessibility improvements (ARIA labels, keyboard nav)
+- [x] Optimize performance (code splitting, lazy loading)
+- [x] Add animations and transitions
+- [x] Implement dark mode with pink/mauve tones
+- [x] **Production Deployment** (Manual Build & Netlify Upload) ✅ [2026-03-21]
 
 **Files to Create/Modify:**
 

@@ -49,8 +49,11 @@ const navigation = [
       }
     }
   },
+  { name: "Monitoring", href: "/monitoring", icon: "wallet" },
   { name: "Settings", href: "/profile", icon: "settings" },
 ];
+
+
 
 export default function Layout({ children }) {
   const { profile, signOut } = useAuth();
@@ -186,7 +189,7 @@ export default function Layout({ children }) {
                 <Icon
                   name={item.icon}
                   color="currentColor"
-                  className="shrink-0 transition-all w-7 h-7"
+                  className="shrink-0 transition-all w-6 h-6"
                 />
                 {isSidebarOpen && <span className="truncate">{item.name}</span>}
               </Link>
@@ -201,7 +204,7 @@ export default function Layout({ children }) {
             className={`w-full flex items-center ${isSidebarOpen ? "gap-3 px-4" : "justify-center px-0"} py-2 text-gray-400 dark:text-dark-muted hover:text-pink-500 dark:hover:text-pink-400 hover:bg-pink-50 dark:hover:bg-dark-border rounded-lg transition-colors text-sm font-black italic`}
             title={!isSidebarOpen ? `Switch to ${theme === 'light' ? 'dark' : 'light'} mode` : undefined}
           >
-            <Icon name={theme === 'light' ? 'moon' : 'sun'} className="w-7 h-7 shrink-0" />
+            <Icon name={theme === 'light' ? 'moon' : 'sun'} className="w-6 h-6 shrink-0" />
             {isSidebarOpen && <span>{theme === 'light' ? 'Dark' : 'Light'} Mode</span>}
           </Motion.button>
           <button
@@ -209,7 +212,7 @@ export default function Layout({ children }) {
             className={`w-full flex items-center ${isSidebarOpen ? "gap-3 px-4" : "justify-center px-0"} py-2 text-gray-400 dark:text-dark-muted hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-lg transition-colors text-sm font-black italic`}
             title={!isSidebarOpen ? "Sign Out" : undefined}
           >
-            <Icon name="logout" className="w-7 h-7 shrink-0" />
+            <Icon name="logout" className="w-6 h-6 shrink-0" />
             {isSidebarOpen && <span>Sign Out</span>}
           </button>
         </div>
@@ -231,12 +234,12 @@ export default function Layout({ children }) {
               key={item.name}
               to={item.href}
               onMouseEnter={() => item.prefetch?.()}
-              className={`flex flex-col items-center p-2 rounded-xl transition-all ${
+              className={`flex flex-col items-center justify-center flex-1 px-1 py-2 rounded-xl transition-all text-center ${
                 isActive ? "text-pink-600 dark:text-pink-400" : "text-gray-400 dark:text-dark-muted"
               }`}
             >
-              <Icon name={item.icon} color="currentColor" className="w-6 h-6" />
-              <span className="text-[10px] font-bold mt-1 uppercase tracking-wider">
+              <Icon name={item.icon} color="currentColor" className="w-5 h-5 sm:w-6 sm:h-6" />
+              <span className="text-[9px] sm:text-[10px] font-bold mt-1 uppercase tracking-tight sm:tracking-wider truncate w-full px-0.5">
                 {item.name}
               </span>
             </Link>

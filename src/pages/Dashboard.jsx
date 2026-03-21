@@ -8,6 +8,9 @@ import { motion as Motion, AnimatePresence } from "motion/react";
 import { queryClient } from "../lib/queryClient";
 import { startOfMonth, endOfMonth, format } from "date-fns";
 import { useAuth } from "../hooks/useAuth";
+import { useGoals } from "../hooks/useGoals";
+import { useBudgets } from "../hooks/useBudgets";
+import { useBudgetStats } from "../hooks/useBudgetStats";
 
 const fadeInUp = {
   initial: { opacity: 0, y: 20 },
@@ -26,7 +29,13 @@ const staggerContainer = {
 
 export default function Dashboard() {
   const { user } = useAuth();
-  const { cards, wallets, transactions, monthlyStats: stats, loading } = useDashboardData(5);
+  const { cards, wallets, transactions, monthlyStats: stats, loading: dashboardLoading } = useDashboardData(5);
+
+  const { goals, loading: goalsLoading } = useGoals();
+  const { budgets, loading: budgetsLoading } = useBudgets();
+  const { data: budgetStats, isLoading: budgetStatsLoading } = useBudgetStats();
+
+  const loading = dashboardLoading || goalsLoading || budgetsLoading || budgetStatsLoading;
 
   // Background Prefetching for other pages
   useEffect(() => {
@@ -47,17 +56,41 @@ export default function Dashboard() {
       staleTime: 1000 * 60 * 5,
     });
 
+    // Prefetch Budgets and Goals
+    queryClient.prefetchQuery({ queryKey: ['budgets', user.id], staleTime: 1000 * 60 * 5 });
+    queryClient.prefetchQuery({ queryKey: ['goals', user.id], staleTime: 1000 * 60 * 5 });
+    queryClient.prefetchQuery({ queryKey: ['budget_stats', user.id], staleTime: 1000 * 60 * 5 });
+
     // Prefetch JS Chunks
     import("./Transactions");
     import("./Reports");
     import("./Accounts");
+    import("./Monitoring");
   }, [user?.id]);
+
 
   const totalBalance = useMemo(() => {
     const cardTotal = cards.reduce((sum, card) => sum + Number(card.balance || 0), 0);
     const walletTotal = wallets.reduce((sum, wallet) => sum + Number(wallet.balance || 0), 0);
     return cardTotal + walletTotal;
   }, [cards, wallets]);
+
+  const budgetProgress = useMemo(() => {
+    if (!budgets.length) return 0;
+    const totalLimit = budgets.reduce((sum, b) => sum + Number(b.limit_amount || 0), 0);
+    const totalSpent = budgets.reduce((sum, b) => {
+      const spent = budgetStats ? (budgetStats[b.category_id] || 0) : 0;
+      return sum + spent;
+    }, 0);
+    return totalLimit > 0 ? Math.round((totalSpent / totalLimit) * 100) : 0;
+  }, [budgets, budgetStats]);
+
+  const goalProgress = useMemo(() => {
+    if (!goals.length) return 0;
+    const totalTarget = goals.reduce((sum, g) => sum + Number(g.target_amount || 0), 0);
+    const totalCurrent = goals.reduce((sum, g) => sum + Number(g.current_amount || 0), 0);
+    return totalTarget > 0 ? Math.round((totalCurrent / totalTarget) * 100) : 0;
+  }, [goals]);
 
   return (
     <Layout>
@@ -169,7 +202,68 @@ export default function Dashboard() {
           </Motion.div>
         </div>
 
+        {/* Monitoring Overview Row */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <Link to="/monitoring?tab=budgets" className="block group">
+            <Motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="bg-white dark:bg-dark-card rounded-[2.5rem] p-8 border border-pink-50 dark:border-dark-border hover:shadow-xl transition-all"
+            >
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-xl font-black text-gray-900 dark:text-dark-text tracking-tight flex items-center gap-2">
+                  <Icon name="reports" className="w-6 h-6 text-pink-500" />
+                  Budget Status
+                </h3>
+                <span className="text-[10px] font-black text-pink-500 uppercase tracking-widest bg-pink-50 dark:bg-dark-bg px-3 py-1 rounded-full group-hover:bg-pink-500 group-hover:text-white transition-colors">Manage</span>
+              </div>
+              <p className="text-sm text-gray-400 dark:text-dark-muted font-bold mb-4 italic">Monitor your category spending limits.</p>
+              <div className="flex items-center gap-4">
+                <div className="flex-1 h-3 bg-pink-50 dark:bg-dark-bg rounded-full overflow-hidden border border-pink-100 dark:border-dark-border">
+                  <Motion.div 
+                    initial={{ width: 0 }}
+                    animate={{ width: `${Math.min(100, budgetProgress)}%` }} 
+                    className="h-full bg-pink-500 rounded-full"
+                  ></Motion.div>
+                </div>
+                <span className="text-xs font-black text-gray-800 dark:text-dark-text tracking-tighter shrink-0">{budgetProgress}% USED</span>
+              </div>
+            </Motion.div>
+          </Link>
+
+          <Link to="/monitoring?tab=goals" className="block group">
+            <Motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="bg-white dark:bg-dark-card rounded-[2.5rem] p-8 border border-pink-50 dark:border-dark-border hover:shadow-xl transition-all"
+            >
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-xl font-black text-gray-900 dark:text-dark-text tracking-tight flex items-center gap-2">
+                  <Icon name="plus" className="w-6 h-6 text-pink-500" />
+                  Savings Goals
+                </h3>
+                <span className="text-[10px] font-black text-pink-500 uppercase tracking-widest bg-pink-50 dark:bg-dark-bg px-3 py-1 rounded-full group-hover:bg-pink-500 group-hover:text-white transition-colors">View All</span>
+              </div>
+              <p className="text-sm text-gray-400 dark:text-dark-muted font-bold mb-4 italic">Track progress toward your financial dreams.</p>
+              <div className="flex items-center gap-4">
+                <div className="flex-1 h-3 bg-pink-50 dark:bg-dark-bg rounded-full overflow-hidden border border-pink-100 dark:border-dark-border">
+                  <Motion.div 
+                    initial={{ width: 0 }}
+                    animate={{ width: `${Math.min(100, goalProgress)}%` }} 
+                    className="h-full bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-full"
+                  ></Motion.div>
+                </div>
+                <span className="text-xs font-black text-gray-800 dark:text-dark-text tracking-tighter shrink-0">{goalProgress}% REACHED</span>
+              </div>
+            </Motion.div>
+          </Link>
+        </div>
+
+
         {/* Recent Activity */}
+
         <Motion.div 
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}

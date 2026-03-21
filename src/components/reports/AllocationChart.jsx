@@ -95,21 +95,7 @@ export default React.memo(function AllocationChart({ data = [] }) {
         )}
       </div>
 
-      {hasData && (
-        <div className="mt-8 grid grid-cols-2 gap-3 relative z-10">
-          {data.slice(0, 4).map((entry, index) => (
-            <div key={index} className="flex items-center gap-2">
-              <span
-                className="w-2 h-2 rounded-full"
-                style={{ backgroundColor: COLORS[index % COLORS.length] }}
-              ></span>
-              <span className="text-[10px] font-bold text-gray-600 dark:text-gray-400 truncate uppercase mt-0.5">
-                {entry.name}
-              </span>
-            </div>
-          ))}
-        </div>
-      )}
+
     </div>
   );
 });

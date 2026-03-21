@@ -51,9 +51,9 @@
                               ┌──────────────────────┐
                               │   Goals Tracking     │
                               │                      │
-                              │ • Savings Goals      │
-                              │ • Progress Monitor   │
-                              │ • Target Dates       │
+                              │ • Automated Tracking │
+                              │ • Linked to Accounts │
+                              │ • Syncs with Balance │
                               └──────────────────────┘
                                           │
                                           ▼
@@ -183,8 +183,8 @@ BudgetTrackerSuperbase/
 
 ### Missing/To Be Implemented
 
--   ❌ Budget tracking features
--   ❌ Goals Tracking (Savings goals and tracking)
+-   ✅ Budget tracking features (Filtering for Expenses only)
+-   ✅ Goals Tracking (Automated tracking via linked Accounts)
 -   ✅ Component architecture (Dashboard, Accounts, Transactions, Reports, etc.)
 -   ✅ Routing (Full set of authenticated and public routes)
 -   ✅ State management (AuthContext and TanStack Query correctly established)
@@ -403,9 +403,9 @@ VITE_SUPABASE_ANON_KEY=
 -   Add/edit/delete transactions (income/expenses/withdrawals)
 -   Payment method selection (cash, specific card, or e-wallet)
 -   Link transactions to bank cards or e-wallets
--   Categorize transactions
+-   Categorize transactions (Expenses only for budgets)
 -   Set monthly budgets per category
--   Visual budget vs. actual spending
+-   Visual budget vs. actual spending (Real-time averages)
 -   Transaction history with filters
 -   Filter by card, e-wallet, category, date range, payment method
 
@@ -601,11 +601,11 @@ VITE_SUPABASE_ANON_KEY=
 
 ### Budget Monitoring
 
-1.  Dashboard shows budget progress bars
-2.  Color-coded indicators (green = under budget, red = over budget)
-3.  Click category to see detailed transactions
-4.  Adjust budget limits as needed
-5.  Real-time updates as transactions are added
+### Goals Monitoring
+1.  Goals linked directly to Bank Cards or E-Wallets.
+2.  `current_amount` derived dynamically from account balance.
+3.  Target progress tracked in real-time.
+4.  Visualized in the Dashboard's average reaching status.
 
 ---
 

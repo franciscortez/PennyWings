@@ -71,6 +71,9 @@ Update this progress as you move through the work.
     - `Signup.jsx`
 - ⚛️ **Use TanStack Query (React Query)** for all server state management (fetching, caching, synchronization, and mutations). Avoid complex `useEffect` chains for data fetching.
 - ✨ **Framer Motion Convention**: When using Framer Motion, always use the `Motion` alias for consistency: `import { motion as Motion } from 'motion/react'`. Use `AnimatePresence` for exit animations.
+- 🎯 **Goals Module**: All savings goals MUST be linked to an account (Bank Card or E-Wallet). The `current_amount` is dynamically derived from the linked account's balance in the `useGoals` hook. Do not implement manual balance entry for goals.
+- 💰 **Budget Module**: Budgets are strictly for `expense` categories. When creating or editing a budget, always filter the category list to show only `type === 'expense'`.
+- 📊 **Dashboard Stats**: The Dashboard cards for "Budget Status" and "Savings Goals" must use real-time averages from `useBudgets`, `useBudgetStats`, and `useGoals` instead of static placeholders.
 
 ---
 
