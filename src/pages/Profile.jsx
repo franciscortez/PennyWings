@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import { useAuth } from "../hooks/useAuth";
 import Layout from "../components/Layout";
 import Icon from "../components/Icon";
-import Swal from "sweetalert2";
-import { motion as Motion, AnimatePresence } from "motion/react";
 import { useTheme } from "../contexts/ThemeContext";
 import { getToast } from "../utils/toast";
+import { getConfirm, confirmPresets } from "../utils/confirm";
+import { motion as Motion, AnimatePresence } from "motion/react"
 
 const container = {
   hidden: { opacity: 0 },
@@ -101,27 +101,17 @@ export default function Profile() {
   };
 
   const handleDeleteAccount = () => {
-    Swal.fire({
+    getConfirm(theme).fire({
+      ...confirmPresets.deleteItem('Account'),
       title: "Are you sure?",
       text: "This will permanently delete your account and all your data. This action cannot be undone!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#EF4444",
-      cancelButtonColor: "#94A3B8",
       confirmButtonText: "Yes, Delete Everything",
-      cancelButtonText: "Cancel",
       preConfirm: () => {
         if (!deletionPassword) {
-          Swal.showValidationMessage("Please enter your current password in the field below first.");
+          getConfirm(theme).showValidationMessage("Please enter your current password in the field below first.");
           return false;
         }
         return true;
-      },
-      customClass: {
-        popup: 'rounded-[2.5rem] p-8 dark:bg-dark-card dark:text-white',
-        title: 'dark:text-white',
-        confirmButton: 'rounded-2xl px-8 py-4 px-10 font-bold',
-        cancelButton: 'rounded-2xl px-8 py-4 font-bold'
       }
     }).then(async (result) => {
       if (result.isConfirmed) {

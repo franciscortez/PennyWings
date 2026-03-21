@@ -3,9 +3,12 @@ import Icon from "../Icon";
 import { useBankCards } from "../../hooks/useBankCards";
 import { useEWallets } from "../../hooks/useEWallets";
 import { useCategories } from "../../hooks/useCategories";
+import { useTheme } from "../../contexts/ThemeContext";
+import { getConfirm } from "../../utils/confirm";
 import { motion as Motion, AnimatePresence } from "motion/react";
 
-export default function TransactionForm({ isOpen, onClose, onSubmit }) {
+export default function TransactionForm({ isOpen, onClose, onSubmit, transaction = null }) {
+  const { theme } = useTheme();
   const { cards } = useBankCards();
   const { wallets } = useEWallets();
   const { categories } = useCategories();
@@ -28,21 +31,39 @@ export default function TransactionForm({ isOpen, onClose, onSubmit }) {
 
   useEffect(() => {
     if (isOpen) {
-      setFormData({
-        type: "expense",
-        amount: "",
-        category_id: "",
-        payment_method: "cash",
-        card_id: "",
-        wallet_id: "",
-        to_payment_method: "card",
-        to_card_id: "",
-        to_wallet_id: "",
-        description: "",
-        transaction_date: new Date().toISOString().split("T")[0],
-      });
+      if (transaction) {
+        // Edit mode: Pre-fill with existing transaction data
+        setFormData({
+          type: transaction.type || "expense",
+          amount: transaction.amount || "",
+          category_id: transaction.category_id || "",
+          payment_method: transaction.payment_method || "cash",
+          card_id: transaction.card_id || "",
+          wallet_id: transaction.wallet_id || "",
+          to_payment_method: transaction.to_card_id ? "card" : transaction.to_wallet_id ? "ewallet" : "card",
+          to_card_id: transaction.to_card_id || "",
+          to_wallet_id: transaction.to_wallet_id || "",
+          description: transaction.description || "",
+          transaction_date: transaction.transaction_date || new Date().toISOString().split("T")[0],
+        });
+      } else {
+        // Add mode: Reset to defaults
+        setFormData({
+          type: "expense",
+          amount: "",
+          category_id: "",
+          payment_method: "cash",
+          card_id: "",
+          wallet_id: "",
+          to_payment_method: "card",
+          to_card_id: "",
+          to_wallet_id: "",
+          description: "",
+          transaction_date: new Date().toISOString().split("T")[0],
+        });
+      }
     }
-  }, [isOpen]);
+  }, [isOpen, transaction]);
 
   // Handle type-based constraints
   useEffect(() => {
@@ -89,7 +110,7 @@ export default function TransactionForm({ isOpen, onClose, onSubmit }) {
       await onSubmit(data);
       onClose();
     } catch (error) {
-      Swal.fire({
+      getConfirm(theme).fire({
         icon: "error",
         title: "Oops...",
         text: "Something went wrong!"
@@ -120,7 +141,7 @@ export default function TransactionForm({ isOpen, onClose, onSubmit }) {
             <div className="p-6 md:p-8 overflow-y-auto custom-scrollbar">
               <div className="flex justify-between items-center mb-6 md:mb-8">
                 <h2 className="text-xl md:text-2xl font-black text-gray-800 dark:text-white tracking-tight">
-                  New Transaction
+                  {transaction ? "Edit Transaction" : "New Transaction"}
                 </h2>
                 <Motion.button
                   whileHover={{ rotate: 90, scale: 1.1 }}
@@ -409,7 +430,7 @@ export default function TransactionForm({ isOpen, onClose, onSubmit }) {
                   type="submit"
                   className="w-full py-4 md:py-5 text-white rounded-[1.5rem] md:rounded-[2rem] font-black text-lg md:text-xl transition-all disabled:opacity-50 bg-gradient-to-r from-pink-500 to-pink-600 shadow-xl shadow-pink-500/20"
                 >
-                  {loading ? "Recording..." : "Save Transaction"}
+                  {loading ? (transaction ? "Updating..." : "Recording...") : (transaction ? "Update Transaction" : "Save Transaction")}
                 </Motion.button>
               </form>
             </div>

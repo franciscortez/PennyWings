@@ -9,7 +9,8 @@ import ReportSummary from '../components/reports/ReportSummary';
 import SpendingChart from '../components/reports/SpendingChart';
 import AllocationChart from '../components/reports/AllocationChart';
 import Icon from '../components/Icon';
-import Swal from 'sweetalert2';
+import { getConfirm } from '../utils/confirm';
+import { useTheme } from '../contexts/ThemeContext';
 import { motion as Motion, AnimatePresence } from 'motion/react'
 import SkeletonLoader from '../components/common/SkeletonLoader';
 
@@ -30,6 +31,7 @@ const item = {
 
 export default function Reports() {
   const { user } = useAuth();
+  const { theme } = useTheme();
   
   // Filtering States
   const [timeframe, setTimeframe] = useState('month'); 
@@ -64,17 +66,13 @@ export default function Reports() {
 
   useEffect(() => {
     if (fetchError) {
-      Swal.fire({
+      getConfirm(theme).fire({
         icon: 'error',
         title: 'Oops...',
         text: 'Failed to load report data. Please try again.',
-        confirmButtonColor: '#EC4899',
-        customClass: {
-          popup: 'rounded-[2.5rem]'
-        }
       });
     }
-  }, [fetchError]);
+  }, [fetchError, theme]);
 
   // Derive providers from fetched transactions to populate the sub-filter
   const availableProviders = useMemo(() => {

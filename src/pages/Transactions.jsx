@@ -4,10 +4,10 @@ import Layout from "../components/Layout";
 import { useTransactions } from "../hooks/useTransactions";
 import TransactionForm from "../components/transactions/TransactionForm";
 import Icon from "../components/Icon";
-import Swal from 'sweetalert2'
-import { motion as Motion, AnimatePresence } from 'motion/react'
 import { useTheme } from "../contexts/ThemeContext";
 import { getToast } from "../utils/toast";
+import { getConfirm, confirmPresets } from "../utils/confirm";
+import { motion as Motion, AnimatePresence } from "motion/react";
 
 const fadeInUp = {
   initial: { opacity: 0, y: 10 },
@@ -42,6 +42,7 @@ export default function Transactions() {
     totalPages,
     loading, 
     addTransaction, 
+    updateTransaction,
     deleteTransaction 
   } = useTransactions({ 
     page, 
@@ -62,14 +63,38 @@ export default function Transactions() {
   }, [page, totalPages, loading, setSearchParams]);
 
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [editingTransaction, setEditingTransaction] = useState(null);
 
-  const handleAddTransaction = async (data) => {
+  const handleOpenAdd = () => {
+    setEditingTransaction(null);
+    setIsFormOpen(true);
+  };
+
+  const handleOpenEdit = (tx) => {
+    setEditingTransaction(tx);
+    setIsFormOpen(true);
+  };
+
+  const handleCloseForm = () => {
+    setIsFormOpen(false);
+    setEditingTransaction(null);
+  };
+
+  const handleFormSubmit = async (data) => {
     try {
-      await addTransaction(data);
-      Toast.fire({
-        icon: 'success',
-        title: 'Transaction recorded! ✨'
-      });
+      if (editingTransaction) {
+        await updateTransaction(editingTransaction.id, data);
+        Toast.fire({
+          icon: 'success',
+          title: 'Transaction updated! ✨'
+        });
+      } else {
+        await addTransaction(data);
+        Toast.fire({
+          icon: 'success',
+          title: 'Transaction recorded! ✨'
+        });
+      }
     } catch (error) {
       Toast.fire({
         icon: 'error',
@@ -80,20 +105,7 @@ export default function Transactions() {
   };
 
   const handleDeleteTransaction = async (tx) => {
-    Swal.fire({
-      title: 'Are you sure?',
-      text: "This will permanently delete the transaction and revert the account balance!",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#EC4899',
-      cancelButtonColor: '#94A3B8',
-      confirmButtonText: 'Yes, Delete it',
-      customClass: {
-        popup: 'rounded-[2.5rem] border border-pink-50 dark:border-dark-border dark:bg-dark-card dark:text-dark-text',
-        confirmButton: 'rounded-2xl px-8 py-3',
-        cancelButton: 'rounded-2xl px-8 py-3'
-      }
-    }).then(async (result) => {
+    getConfirm(theme).fire(confirmPresets.deleteItem('Transaction')).then(async (result) => {
       if (result.isConfirmed) {
         try {
           await deleteTransaction(tx);
@@ -153,7 +165,7 @@ export default function Transactions() {
           <Motion.button 
             whileHover={{ scale: 1.05, y: -4 }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => setIsFormOpen(true)}
+            onClick={handleOpenAdd}
             className="flex items-center justify-center gap-2 px-8 py-4 bg-pink-500 text-white rounded-[2rem] font-black hover:bg-pink-600 transition-all font-bold"
           >
             <Icon name="plus" color="white" className="w-5 h-5" />
@@ -292,14 +304,24 @@ export default function Transactions() {
                           </span>
                         </td>
                         <td className="px-8 py-6 text-center">
-                          <Motion.button 
-                            whileHover={{ scale: 1.1, backgroundColor: theme === 'dark' ? '#312e8166' : '#FFF1F2' }}
-                            whileTap={{ scale: 0.9 }}
-                            onClick={() => handleDeleteTransaction(tx)}
-                            className="p-3 text-gray-200 dark:text-dark-muted hover:text-rose-500 rounded-xl transition-colors"
-                          >
-                            <Icon name="delete" color="currentColor" className="w-5 h-5" />
-                          </Motion.button>
+                          <div className="flex items-center justify-center gap-1">
+                            <Motion.button 
+                              whileHover={{ scale: 1.1, backgroundColor: theme === 'dark' ? '#312e8166' : '#F0F9FF' }}
+                              whileTap={{ scale: 0.9 }}
+                              onClick={() => handleOpenEdit(tx)}
+                              className="p-3 text-gray-200 dark:text-dark-muted hover:text-blue-500 rounded-xl transition-colors"
+                            >
+                              <Icon name="edit" color="currentColor" className="w-5 h-5" />
+                            </Motion.button>
+                            <Motion.button 
+                              whileHover={{ scale: 1.1, backgroundColor: theme === 'dark' ? '#312e8166' : '#FFF1F2' }}
+                              whileTap={{ scale: 0.9 }}
+                              onClick={() => handleDeleteTransaction(tx)}
+                              className="p-3 text-gray-200 dark:text-dark-muted hover:text-rose-500 rounded-xl transition-colors"
+                            >
+                              <Icon name="delete" color="currentColor" className="w-5 h-5" />
+                            </Motion.button>
+                          </div>
                         </td>
                       </Motion.tr>
                     ))}
@@ -376,8 +398,9 @@ export default function Transactions() {
 
       <TransactionForm 
         isOpen={isFormOpen} 
-        onClose={() => setIsFormOpen(false)} 
-        onSubmit={handleAddTransaction} 
+        onClose={handleCloseForm} 
+        onSubmit={handleFormSubmit} 
+        transaction={editingTransaction}
       />
     </Layout>
   );

@@ -5,7 +5,7 @@ import { useTheme } from "../contexts/ThemeContext";
 import { queryClient } from "../lib/queryClient";
 import { startOfMonth, endOfMonth, format } from "date-fns";
 import Icon from "./Icon";
-import Swal from "sweetalert2";
+import { getConfirm, confirmPresets } from "../utils/confirm";
 import AnimatedPage from "./common/AnimatedPage";
 import { motion as Motion } from "motion/react";
 
@@ -70,24 +70,7 @@ export default function Layout({ children }) {
   };
 
   const handleLogout = () => {
-    Swal.fire({
-      title: "Wait! Leaving?",
-      text: "Are you sure you want to sign out? Your pennies will miss you!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#EC4899", // pink-500
-      cancelButtonColor: "#94A3B8", // slate-400
-      confirmButtonText: "Yes, Log Me Out",
-      cancelButtonText: "Cancel",
-      background: "#fff",
-      borderRadius: "2rem",
-      customClass: {
-        popup: "rounded-[2.5rem] p-8 font-bold",
-        title: "text-2xl font-black text-gray-900",
-        confirmButton: "rounded-2xl px-8 py-4 px-10 font-black tracking-tight",
-        cancelButton: "rounded-2xl px-8 py-4 font-black tracking-tight",
-      },
-    }).then((result) => {
+    getConfirm(theme).fire(confirmPresets.logout).then((result) => {
       if (result.isConfirmed) {
         signOut();
       }

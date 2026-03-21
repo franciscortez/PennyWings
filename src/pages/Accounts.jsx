@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react'
-import Swal from 'sweetalert2'
+import { getConfirm, confirmPresets } from '../utils/confirm'
+import { useTheme } from '../contexts/ThemeContext'
 import { useSearchParams } from 'react-router-dom'
 import Layout from '../components/Layout'
 import TotalBalance from '../components/accounts/TotalBalance'
@@ -13,6 +14,7 @@ import Icon from '../components/Icon'
 import { motion as Motion, AnimatePresence } from 'motion/react'
 
 export default function Accounts() {
+  const { theme } = useTheme()
   const { cards, loading: loadingCards, addCard, updateCard, deleteCard } = useBankCards()
   const { wallets, loading: loadingWallets, addWallet, updateWallet, deleteWallet } = useEWallets()
 
@@ -89,39 +91,22 @@ export default function Accounts() {
   }
 
   const handleDeleteCard = async (id) => {
-    Swal.fire({
-      title: 'Delete Card?',
-      text: "Every penny counts! This action cannot be undone.",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#F43F5E', // rose-500
-      cancelButtonColor: '#94A3B8', // slate-400
-      confirmButtonText: 'Yes, Delete It',
-      customClass: {
-        popup: 'rounded-[2.5rem] p-8 font-bold border border-pink-50 dark:border-dark-border dark:bg-dark-card dark:text-dark-text',
-        confirmButton: 'rounded-2xl px-6 py-3',
-        cancelButton: 'rounded-2xl px-6 py-3'
-      }
-    }).then(async (result) => {
+    getConfirm(theme).fire(confirmPresets.deleteItem('Card')).then(async (result) => {
       if (result.isConfirmed) {
         const { error } = await deleteCard(id)
         if (error) {
-          Swal.fire({
+          getConfirm(theme).fire({
             icon: 'error',
             title: 'Oops...',
             text: error,
-            confirmButtonColor: '#EC4899',
           })
         } else {
-          Swal.fire({
+          getConfirm(theme).fire({
             icon: 'success',
             title: 'Deleted!',
             text: 'Your card has been removed.',
             timer: 1500,
             showConfirmButton: false,
-            customClass: {
-              popup: 'rounded-[2.5rem] p-8'
-            }
           })
         }
       }
@@ -129,39 +114,22 @@ export default function Accounts() {
   }
 
   const handleDeleteWallet = async (id) => {
-    Swal.fire({
-      title: 'Delete Wallet?',
-      text: "One less place for pennies to fly? This cannot be undone.",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#F43F5E',
-      cancelButtonColor: '#94A3B8',
-      confirmButtonText: 'Yes, Delete It',
-      customClass: {
-        popup: 'rounded-[2.5rem] p-8 font-bold border border-pink-50 dark:border-dark-border dark:bg-dark-card dark:text-dark-text',
-        confirmButton: 'rounded-2xl px-6 py-3',
-        cancelButton: 'rounded-2xl px-6 py-3'
-      }
-    }).then(async (result) => {
+    getConfirm(theme).fire(confirmPresets.deleteItem('Wallet')).then(async (result) => {
       if (result.isConfirmed) {
         const { error } = await deleteWallet(id)
         if (error) {
-          Swal.fire({
+          getConfirm(theme).fire({
             icon: 'error',
             title: 'Oops...',
             text: error,
-            confirmButtonColor: '#EC4899',
           })
         } else {
-          Swal.fire({
+          getConfirm(theme).fire({
             icon: 'success',
             title: 'Deleted!',
             text: 'Your wallet has been removed.',
             timer: 1500,
             showConfirmButton: false,
-            customClass: {
-              popup: 'rounded-[2.5rem] p-8'
-            }
           })
         }
       }
