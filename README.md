@@ -6,93 +6,19 @@
 
 ---
 
-## 📋 Before You Start
+## 🚀 Overview
 
-**IMPORTANT:** This project follows a structured development workflow. Before writing any code or implementing features, you must first generate the codebase context.
+**PennyWings** is a personal finance management tool designed for users who appreciate a premium aesthetic while tracking their financial health. It provides real-time synchronization across devices, automated goal tracking, and detailed spending insights.
 
-### Why Context First?
+### ✨ Key Features
 
-Following the workflow defined in `.amazonq/rules/RULES.md`, we ensure:
-- ✅ Clear understanding of the current codebase state
-- ✅ Proper identification of relevant files and patterns
-- ✅ Well-defined tasks with clear dependencies
-- ✅ Structured execution plans before implementation
-- ✅ Progress tracking throughout development
-
----
-
-## 🚀 Quick Start
-
-### 1. Generate Codebase Context
-
-**Run this command FIRST before any development:**
-
-```bash
-npm run context
-```
-
-This will display:
-- 📊 Project overview and purpose
-- 🛠️ Technologies and tools being used
-- 📁 Current project structure
-- ✅ Setup status (what's ready, what's missing)
-- 📝 Available npm scripts
-- 🏗️ System architecture overview
-- 📈 Task progress summary
-- 🎯 Next steps for development
-
-### 2. Review Documentation
-
-After running the context script, review these files:
-
-```bash
-.amazonq/rules/
-├── CONTEXT.md          # Full project context and technical details
-├── RULES.md            # Development workflow rules
-├── TASK-PROGRESS.md    # Current task status and history
-└── DEPLOYMENT.md       # Deployment guidelines
-```
-
-### 3. Start Development
-
-Once you understand the context:
-
-```bash
-npm run dev              # Start development server
-npm run build            # Build for production
-npm run lint             # Run ESLint
-npm run preview          # Preview production build
-```
-
----
-
-## 📖 Development Workflow
-
-### Phase 1: Codebase Context ✅
-- Inspect the codebase and understand current state
-- Identify relevant files, patterns, and conventions
-- Review existing components and utilities
-
-### Phase 2: Task Understanding 📝
-- Define the task to be completed
-- Identify current state of relevant features
-- List assumptions, dependencies, and risks
-- Note any missing information or blockers
-
-### Phase 3: Execution Plan 🗺️
-- Break work into clear phases
-- Identify files to create or modify
-- Explain why each step is necessary
-- Consider dependencies between modules
-- Include validation and testing strategy
-
-### Phase 4: Progress Tracking 📊
-- Maintain running status:
-  - ⏸️ Not started
-  - 🔄 In progress
-  - ✅ Completed
-  - 🚫 Blocked
-- Update `TASK-PROGRESS.md` as you work
+- ✅ **Unified Accounts Management**: Support for Digital/Traditional Banks and E-Wallets with a 3-step creation wizard.
+- ✅ **Dynamic Transfers**: Move funds between accounts (Bank, E-Wallet, or physical Cash) with atomic balance updates.
+- ✅ **Automated Goal Tracking**: Savings goals are linked directly to account balances, updating progress automatically without manual logging.
+- ✅ **Smart Budgets**: Category-based budget limits for expenses with real-time visualization of spending pulse.
+- ✅ **Transaction Insights**: Comprehensive history with advanced filtering (by account, category, or payment method).
+- ✅ **Real-time Sync**: Powered by Supabase Realtime and TanStack Query for seamless data consistency.
+- ✅ **Premium UI/UX**: High-fidelity glassmorphism design with Framer Motion animations and custom pink color palette.
 
 ---
 
@@ -100,86 +26,57 @@ npm run preview          # Preview production build
 
 ### Core Modules
 
-1. **Authentication Layer** - Supabase Auth (login/signup/protected routes)
-2. **Accounts Module** - Unified AccountWizard (Digital/Traditional Banks, E-Wallets)
-3. **Transactions Module** - Income/expense tracking linked to accounts
-4. **Goals Module** - Savings goals and progress tracking
-5. **Dashboard** - Overview and analytics with real-time net worth
+1. **Authentication Layer**: Secure email/password login and signup powered by Supabase Auth with protected route wrappers.
+2. **Accounts Module**: Unified management via `AccountWizard` (Digital/Traditional Banks, E-Wallets).
+3. **Transactions Module**: Full CRUD for income, expenses, and withdrawals/transfers linked to accounts.
+4. **Goals Module**: Financial planning with real-time progress derived from linked account balances.
+5. **Dashboard**: Centralized hub with financial pulse reports, net worth tracking, and interactive analytics.
 
 ### Data Flow
 
 ```
-User Action → React Component → Supabase Client → PostgreSQL + RLS → Real-time Sync
+User Action → React Component → Supabase RPC/PostgreSQL → Real-time Sync (TanStack Query)
 ```
-
-### Design System
-
-- **Theme:** Light pink aesthetic (#FFC0CB, #FFB6C1, #FFF0F5)
-- **Framework:** Tailwind CSS with custom pink color palette
-- **Icons:** Lucide React for consistent, theme-aware iconography
-- **Notifications:** SweetAlert2 for premium, themed dialogs
-- **Components:** Card-based UI with mobile-first responsive design
-- **Accessibility:** WCAG compliant contrast ratios on pink backgrounds
 
 ---
 
 ## 🛠️ Tech Stack
 
 ### Core Technologies
-- **React 19.2.4** - UI library with hooks and modern features
-- **Vite 8.0.0** - Fast build tool and dev server with HMR
-- **Supabase** - Backend-as-a-Service (PostgreSQL, Auth, Real-time, Storage)
-- **Tailwind CSS** - Utility-first CSS framework for styling
-- **Lucide React** - High-quality, consistent icon library
-- **SweetAlert2** - Premium, customizable notification system
-- **React Router** - Client-side routing
-- **Recharts** - Data visualization library
-- **date-fns** - Modern date utility library
+- **React 19.2.4**: Modern UI library with hooks and code-splitting.
+- **TanStack Query (React Query) v5**: Asynchronous state management and caching.
+- **Vite 8.0.0**: High-performance build tool and dev server.
+- **Supabase**: Backend-as-a-Service (PostgreSQL, Auth, Real-time).
+- **Tailwind CSS 3.4**: Utility-first styling with custom pink palette.
+- **Motion (Framer Motion)**: Production-ready animations and transitions.
+- **Lucide React**: Consistent, theme-aware iconography.
+- **SweetAlert2**: Premium themed notifications and dialogs.
+- **Recharts**: Interactive data visualization for spending reports.
 
 ### Development Tools
-- **ESLint** - Code linting with React-specific rules
-- **@vitejs/plugin-react** - React Fast Refresh support
-- **Supabase MCP Server** - Infrastructure and backend management
-- **Netlify MCP** - Automated deployment and site management
+- **ESLint**: Code linting for React standards.
+- **Netlify**: CI/CD and production hosting.
 
 ---
 
 ## 📁 Project Structure
 
 ```
-BudgetTrackerSuperbase/
-├── .amazonq/
-│   └── rules/              # AI assistant rules and context
-│       ├── CONTEXT.md      # Full project context
-│       ├── RULES.md        # Development workflow
-│       ├── TASK-PROGRESS.md # Task tracking
-│       └── DEPLOYMENT.md   # Deployment guide
-├── public/
-│   ├── favicon.svg
-│   └── icons.svg
+PennyWings/
+├── public/                 # Static assets and SVG icons
 ├── src/
-│   ├── assets/             # Images and static files
-│   ├── components/         # React components
-│   ├── contexts/           # React contexts (Auth, etc.)
-│   ├── hooks/              # Custom React hooks
-│   ├── lib/                # Supabase client and utilities
-│   ├── pages/              # Page components
-│   ├── utils/              # Helper functions
-│   ├── App.jsx             # Main app component
-│   ├── App.css             # App-specific styles
-│   ├── index.css           # Global styles and Tailwind
-│   └── main.jsx            # React entry point
-├── .env.local              # Environment variables (not in git)
-├── .gitignore
-├── eslint.config.js        # ESLint configuration
-├── index.html              # HTML entry point
-├── init-context.js         # Context initialization script
-├── netlify.toml            # Netlify deployment config
-├── package.json            # Dependencies and scripts
-├── postcss.config.js       # PostCSS configuration
-├── tailwind.config.js      # Tailwind configuration
-├── vite.config.js          # Vite configuration
-└── README.md               # This file
+│   ├── assets/             # Images and brand graphics
+│   ├── components/         # Reusable UI (Accounts, Budgets, Goals, etc.)
+│   ├── contexts/           # Auth and Theme providers
+│   ├── hooks/              # Custom TanStack Query and data hooks
+│   ├── lib/                # Supabase and QueryClient config
+│   ├── pages/              # Routed page components (Dashboard, Transactions, etc.)
+│   ├── utils/              # Helper functions (Toasts, Confirms, Math)
+│   ├── App.jsx             # Main router and provider configuration
+│   └── index.css           # Global Tailwind and premium animation styles
+├── netlify.toml            # Netlify deployment configuration
+├── tailwind.config.js      # Custom pink palette and animations
+└── vite.config.js          # Vite optimization settings
 ```
 
 ---
@@ -190,14 +87,13 @@ BudgetTrackerSuperbase/
 - Node.js (v18+)
 - npm or yarn
 - Supabase account
-- Git
 
 ### Installation
 
 1. **Clone the repository**
    ```bash
    git clone <repository-url>
-   cd BudgetTrackerSuperbase
+   cd PennyWings
    ```
 
 2. **Install dependencies**
@@ -206,19 +102,13 @@ BudgetTrackerSuperbase/
    ```
 
 3. **Set up environment variables**
-   
-   Create `.env.local` file:
+   Create a `.env.local` file:
    ```env
    VITE_SUPABASE_URL=your_project_url
    VITE_SUPABASE_ANON_KEY=your_anon_key
    ```
 
-4. **Generate context (IMPORTANT)**
-   ```bash
-   npm run context
-   ```
-
-5. **Start development server**
+4. **Start development server**
    ```bash
    npm run dev
    ```
@@ -227,95 +117,43 @@ BudgetTrackerSuperbase/
 
 ## 🎨 Design Guidelines
 
-### Color Palette
+### Pink Color Palette
 
 ```css
-/* Light Mode */
---pink-50: #fff0f5;   /* Lavender Blush - backgrounds */
---pink-100: #ffe4e9;  /* Very light pink - cards */
---pink-200: #ffb6c1;  /* Light Pink - borders */
---pink-300: #ffc0cb;  /* Pink - primary */
---pink-400: #ff9ead;  /* Medium pink - hover states */
---pink-500: #ff7a93;  /* Deep pink - accents */
---pink-600: #e85d7a;  /* Rose - CTAs */
+/* Custom PennyWings Palette */
+--pink-50: #fff0f5;   /* Lavender Blush - Backgrounds */
+--pink-100: #ffe4e9;  /* Very Light Pink - Cards */
+│                     ...
+--pink-500: #ff7a93;  /* Deep Pink - Accents */
+--pink-600: #e85d7a;  /* Rose - Primary CTAs */
 ```
 
-### Component Patterns
-- **Cards:** White/light pink background, subtle shadow, rounded corners
-- **Buttons:** Pink gradient, white text, hover effects
-- **Forms:** Light pink borders, focus states with deeper pink
-- **Bank Cards:** Card-like UI with custom colors, balance display
-- **E-Wallets:** Wallet-like UI with custom colors, balance display
+### UI Patterns
+- **Glassmorphism**: Components feature white backdrops with 80% opacity and subtle backdrop blur.
+- **Animations**: Page transitions and button interactions utilize the `Motion` alias for Framer Motion.
+- **Icons**: Branded Lucide icons styled with custom colors and opacity levels.
 
 ---
 
-## 📊 Current Progress
+## ⚡ Performance & Optimization
 
-### Completed ✅
-- Foundation (Supabase + Tailwind + Structure)
-- Authentication System (Login, Signup, Password Reset)
-- Database Schema with RLS policies
-- Accounts Module (Unified AccountWizard)
-- Transactions Module (Income/Expense/Withdrawal)
-- Dashboard (Overview, Analytics, Recent Activity)
-- Data Visualization (Charts and Reports)
+PennyWings is engineered for speed and responsiveness through several key architectural decisions:
 
-### In Progress 🔄
-- Goals Tracking Module
-- Export Functionality (CSV/PDF)
-- Real-time Sync Enhancements
-
-### Planned ⏸️
-- Advanced Filtering
-- Performance Optimizations
-- Dark Mode Implementation
+- **Code Splitting**: Routes are lazy-loaded using `React.lazy()` and `Suspense`, reducing the initial bundle size and speeding up the first meaningful paint.
+- **TanStack Query (React Query) v5**: Implements sophisticated caching, background data fetching, and optimistic updates to eliminate redundant network requests.
+- **Atomic Balance Updates**: Uses Supabase RPC (Stored Procedures) to handle complex financial logic on the server, ensuring data integrity and reducing client-side processing.
+- **Real-time Subscriptions**: Leverages Supabase Realtime to keep the UI in sync across multiple devices without manual page refreshes.
+- **Asset Optimization**: Uses SVG sprites and optimized PNG assets to minimize load times.
 
 ---
 
 ## 🚀 Deployment
 
-### Build for Production
+The project is hosted on **Netlify** with continuous deployment.
 
-```bash
-npm run build
-```
-
-This creates an optimized production build in the `dist/` folder.
-
-### Deploy to Netlify
-
-The project is configured for automatic deployment via Netlify MCP:
-
-1. **Build Command:** `npm run build`
-2. **Publish Directory:** `dist`
-3. **Environment Variables:** Set in Netlify dashboard
-
-See `.amazonq/rules/DEPLOYMENT.md` for detailed deployment instructions.
-
----
-
-## 📚 Documentation
-
-- **[CONTEXT.md](.amazonq/rules/CONTEXT.md)** - Comprehensive project context
-- **[RULES.md](.amazonq/rules/RULES.md)** - Development workflow rules
-- **[TASK-PROGRESS.md](.amazonq/rules/TASK-PROGRESS.md)** - Task tracking and history
-- **[DEPLOYMENT.md](.amazonq/rules/DEPLOYMENT.md)** - Deployment guidelines
-
----
-
-## 🤝 Contributing
-
-1. **Always run `npm run context` first** to understand the current state
-2. Follow the workflow defined in `RULES.md`
-3. Update `TASK-PROGRESS.md` with your changes
-4. Maintain the pink color palette and design system
-5. Write clean, documented code following existing patterns
-
----
-
-## 📝 License
-
-This project is private and proprietary.
+1. **Build command**: `npm run build`
+2. **Publish directory**: `dist`
+3. **SPA Redirects**: Handled via `netlify.toml` for React Router compatibility.
 
 ---
 
@@ -326,13 +164,3 @@ This project is private and proprietary.
 - Styled with [Tailwind CSS](https://tailwindcss.com/)
 - Icons by [Lucide](https://lucide.dev/)
 - Deployed on [Netlify](https://www.netlify.com/)
-
----
-
-## 📞 Support
-
-For questions or issues, please refer to the documentation in `.amazonq/rules/` or contact the development team.
-
----
-
-**Remember:** Always run `npm run context` before starting any development work! 🦋
