@@ -1,15 +1,33 @@
 import React from 'react';
 import GoalItem from './GoalItem';
+import SkeletonLoader from '../common/SkeletonLoader';
 import { motion as Motion, AnimatePresence } from 'motion/react';
 import Icon from '../Icon';
 
 const GoalList = ({ goals, loading, onEdit, onDelete, onAdd }) => {
   if (loading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {[1, 2].map(i => (
-          <div key={i} className="h-64 bg-white dark:bg-dark-card rounded-[2.5rem] animate-pulse border border-pink-50 dark:border-dark-border" />
-        ))}
+      <div className="space-y-10">
+        <div className="flex justify-between items-center">
+          <SkeletonLoader className="h-8 w-48" />
+          <SkeletonLoader className="h-12 w-40 rounded-[1.5rem]" />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {[1, 2].map(i => (
+            <div key={i} className="bg-white dark:bg-dark-card rounded-[2.5rem] p-8 border border-pink-50 dark:border-dark-border space-y-5">
+              <div className="flex items-center justify-between">
+                <SkeletonLoader className="h-6 w-32" />
+                <SkeletonLoader className="h-6 w-16 rounded-full" />
+              </div>
+              <SkeletonLoader className="h-4 w-2/3" />
+              <SkeletonLoader className="h-4 w-full rounded-full" />
+              <div className="flex justify-between">
+                <SkeletonLoader className="h-4 w-24" />
+                <SkeletonLoader className="h-4 w-20" />
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }

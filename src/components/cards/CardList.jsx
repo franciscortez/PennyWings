@@ -1,6 +1,6 @@
 import React from 'react'
 import CardItem from './CardItem'
-import LoadingSpinner from '../common/LoadingSpinner'
+import SkeletonLoader from '../common/SkeletonLoader'
 import Icon from '../Icon'
 import { useTheme } from '../../contexts/ThemeContext'
 import { motion as Motion, AnimatePresence } from 'motion/react'
@@ -8,7 +8,23 @@ import { motion as Motion, AnimatePresence } from 'motion/react'
 export default function CardList({ cards, loading, onEdit, onDelete }) {
   const { theme } = useTheme()
   
-  if (loading) return <LoadingSpinner />
+  if (loading) return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+      {[1, 2, 3].map(i => (
+        <div key={i} className="bg-white dark:bg-dark-card rounded-[2rem] p-6 border border-pink-50 dark:border-dark-border space-y-4">
+          <div className="flex items-center gap-3">
+            <SkeletonLoader className="w-12 h-12 rounded-xl" />
+            <div className="flex-1 space-y-2">
+              <SkeletonLoader className="h-4 w-2/3" />
+              <SkeletonLoader className="h-3 w-1/3" />
+            </div>
+          </div>
+          <SkeletonLoader className="h-8 w-1/2" />
+          <SkeletonLoader className="h-3 w-full" />
+        </div>
+      ))}
+    </div>
+  )
 
   if (cards.length === 0) {
     return (

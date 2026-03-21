@@ -1,15 +1,32 @@
 import React from 'react';
 import BudgetItem from './BudgetItem';
+import SkeletonLoader from '../common/SkeletonLoader';
 import { motion as Motion, AnimatePresence } from 'motion/react';
 import Icon from '../Icon';
 
 const BudgetList = ({ budgets, stats, loading, onEdit, onDelete, onAdd }) => {
   if (loading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {[1, 2, 3].map(i => (
-          <div key={i} className="h-48 bg-white dark:bg-dark-card rounded-[2rem] animate-pulse border border-pink-50 dark:border-dark-border" />
-        ))}
+      <div className="space-y-8">
+        <div className="flex justify-between items-center">
+          <SkeletonLoader className="h-7 w-40" />
+          <SkeletonLoader className="h-11 w-36 rounded-2xl" />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[1, 2, 3].map(i => (
+            <div key={i} className="bg-white dark:bg-dark-card rounded-[2rem] p-6 border border-pink-50 dark:border-dark-border space-y-4">
+              <div className="flex items-center justify-between">
+                <SkeletonLoader className="h-5 w-24" />
+                <SkeletonLoader className="h-5 w-12 rounded-full" />
+              </div>
+              <SkeletonLoader className="h-3 w-full rounded-full" />
+              <div className="flex justify-between">
+                <SkeletonLoader className="h-4 w-20" />
+                <SkeletonLoader className="h-4 w-16" />
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }

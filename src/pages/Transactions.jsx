@@ -4,6 +4,7 @@ import Layout from "../components/Layout";
 import { useTransactions } from "../hooks/useTransactions";
 import TransactionForm from "../components/transactions/TransactionForm";
 import Icon from "../components/Icon";
+import SkeletonLoader from "../components/common/SkeletonLoader";
 import { useTheme } from "../contexts/ThemeContext";
 import { getToast } from "../utils/toast";
 import { getConfirm, confirmPresets } from "../utils/confirm";
@@ -221,9 +222,20 @@ export default function Transactions() {
           className="bg-white dark:bg-dark-card rounded-[3rem] border border-pink-50 dark:border-dark-border overflow-hidden"
         >
           {loading ? (
-            <div className="py-20 flex flex-col items-center">
-              <div className="w-12 h-12 border-4 border-pink-100 border-t-pink-500 rounded-full animate-spin mb-4"></div>
-              <p className="text-gray-400 dark:text-dark-muted font-black tracking-widest uppercase animate-pulse text-xs">Fetching Ledger...</p>
+            <div className="p-6 space-y-4">
+              {[1, 2, 3, 4, 5].map(i => (
+                <div key={i} className="flex items-center gap-5 p-5 bg-white dark:bg-dark-bg border border-pink-50 dark:border-dark-border rounded-[2rem]">
+                  <SkeletonLoader className="w-12 h-12 rounded-xl shrink-0" />
+                  <div className="flex-1 space-y-3">
+                    <SkeletonLoader className="h-4 w-2/3" />
+                    <SkeletonLoader className="h-3 w-1/3" />
+                  </div>
+                  <div className="text-right space-y-2 shrink-0">
+                    <SkeletonLoader className="h-5 w-20 ml-auto" />
+                    <SkeletonLoader className="h-3 w-12 ml-auto" />
+                  </div>
+                </div>
+              ))}
             </div>
           ) : transactions.length > 0 ? (
             <div className="overflow-x-auto">
