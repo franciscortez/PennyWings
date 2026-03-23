@@ -39,13 +39,13 @@ export default function AIChatWindow({ isOpen, onClose }) {
         const prevSpent = budgetStats?.[prev.category_id] || 0;
         const currentSpent = budgetStats?.[current.category_id] || 0;
         return (prevSpent > currentSpent) ? prev : current;
-      }).category_name
+      }).category?.name
     : 'N/A';
 
   const detailedBudgets = budgets.map(b => {
     const spent = budgetStats?.[b.category_id] || 0;
     const limit = Number(b.limit_amount || 0);
-    return `${b.category_name}: ₱${spent} / ₱${limit}`;
+    return `${b.category?.name || 'Unknown'}: ₱${spent} / ₱${limit}`;
   }).join(', ');
 
   const accountBalances = [

@@ -3,9 +3,9 @@ import Icon from "../Icon";
 
 export default function PageLoader() {
   return (
-    <div className="min-h-screen bg-pink-50 flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen bg-pink-50 dark:bg-dark-bg transition-colors duration-300 flex flex-col items-center justify-center p-4">
       <svg
-        className="w-24 h-24 text-pink-500 animate-bounce mb-6"
+        className="w-24 h-24 text-pink-500 dark:text-pink-400 animate-bounce mb-6"
         viewBox="0 0 100 100"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
@@ -16,7 +16,7 @@ export default function PageLoader() {
           strokeWidth="2"
           fill="none"
         />
-        <path
+        <path 
           d="M 52 20 C 60 10 70 15 65 20"
           stroke="currentColor"
           strokeWidth="2"
@@ -43,15 +43,15 @@ export default function PageLoader() {
       </svg>
       <div className="flex gap-2 items-center">
         <div
-          className="w-3 h-3 bg-pink-400 rounded-full animate-pulse"
+          className="w-3 h-3 bg-pink-400 dark:bg-pink-300 rounded-full animate-pulse"
           style={{ animationDelay: "0ms" }}
         />
         <div
-          className="w-3 h-3 bg-pink-500 rounded-full animate-pulse"
+          className="w-3 h-3 bg-pink-500 dark:bg-pink-400 rounded-full animate-pulse"
           style={{ animationDelay: "150ms" }}
         />
         <div
-          className="w-3 h-3 bg-pink-600 rounded-full animate-pulse"
+          className="w-3 h-3 bg-pink-600 dark:bg-pink-500 rounded-full animate-pulse"
           style={{ animationDelay: "300ms" }}
         />{" "}
       </div>

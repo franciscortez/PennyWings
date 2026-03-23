@@ -18,7 +18,7 @@ export default function AIFloatingButton() {
             whileHover={{ scale: 1.1, y: -5 }}
             whileTap={{ scale: 0.9 }}
             onClick={() => setIsOpen(true)}
-            className="hidden md:flex fixed bottom-6 right-6 w-16 h-16 bg-gradient-to-tr from-pink-600 via-pink-500 to-rose-400 rounded-full shadow-2xl shadow-pink-500/40 items-center justify-center text-white z-[70] border border-white/30 backdrop-blur-xl group overflow-hidden"
+            className="hidden md:flex fixed bottom-6 right-6 w-16 h-16 bg-gradient-to-tr from-pink-600 via-pink-500 to-rose-400 rounded-full items-center justify-center text-white z-[70] border border-white/30 backdrop-blur-xl group overflow-hidden"
             title="Chat with Penny AI"
           >
             {/* Animated background pulse */}

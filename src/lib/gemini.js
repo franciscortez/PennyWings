@@ -50,8 +50,9 @@ export const getFinancialAdvice = async (userPrompt, userContext, history = []) 
           2. Use "₱" for currency.
           3. Address the user by their name ("${userContext.userName || 'Friend'}") when appropriate to feel personal.
           4. Base your advice on the user's specific accounts, budgets, and recent transactions provided above.
-          5. Focus on explaining the user's data and giving helpful budgeting tips.
-          6. If you don't have enough data to answer a specific query, ask the user for clarification.
+          5. Focus on explaining the user's data (using the specific category names provided) and giving helpful budgeting tips.
+          6. If you notice a user has a budget for a category (like "Shopping"), refer to it by name.
+          7. If you don't have enough data to answer a specific query, ask the user for clarification.
         `
       });
 
