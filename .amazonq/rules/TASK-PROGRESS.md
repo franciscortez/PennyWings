@@ -22,6 +22,19 @@ Rebranded "Seabank" to "Maribank" in the digital bank provider list within the `
 - A new "Seabank to Maribank" category is available for more granular transaction tracking.
 - All frontend dropdowns are automatically synchronized with these changes.
 
+### Adding 'Date' Expense Category - 2026-03-26
+
+**Status:** ✅ Completed
+
+**Description:**
+Added a new specialized expense category titled "Date" to the `categories` table. This category is intended for social or dating-related expenses and is visually represented by a heart icon with a distinct pink color palette.
+
+**Files Modified/Created:**
+- `Supabase SQL` (Injected 'Date' category into the `categories` table)
+
+**Outcome:**
+- The "Date" category is now globally available in the application's transaction forms for expense-type entries.
+
 ---
 
 ## 🎯 Current Task
