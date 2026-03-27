@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Layout from '../components/Layout';
 import { motion as Motion, AnimatePresence } from 'motion/react';
 import Icon from '../components/Icon';
@@ -9,6 +9,7 @@ export default function Calculator() {
   const [prevVal, setPrevVal] = useState(null);
   const [operator, setOperator] = useState(null);
   const [waitingForNewValue, setWaitingForNewValue] = useState(false);
+  const [activeKey, setActiveKey] = useState(null);
 
   const calculate = (a, b, op) => {
     const numA = parseFloat(a);
@@ -48,25 +49,25 @@ export default function Calculator() {
     setDisplay((val * -1).toString());
   };
 
-  const inputDigit = (digit) => {
+  const inputDigit = useCallback((digit) => {
     if (waitingForNewValue) {
       setDisplay(digit);
       setWaitingForNewValue(false);
     } else {
-      setDisplay(display === '0' ? digit : display + display.includes('.') && digit === '.' ? '' : display + digit);
+      setDisplay(display === '0' ? digit : display + (display.includes('.') && digit === '.' ? '' : digit));
     }
-  };
+  }, [display, waitingForNewValue]);
 
-  const inputDot = () => {
+  const inputDot = useCallback(() => {
     if (waitingForNewValue) {
       setDisplay('0.');
       setWaitingForNewValue(false);
     } else if (display.indexOf('.') === -1) {
       setDisplay(display + '.');
     }
-  };
+  }, [display, waitingForNewValue]);
 
-  const handleOperator = (nextOperator) => {
+  const handleOperator = useCallback((nextOperator) => {
     const inputValue = parseFloat(display);
 
     if (prevVal === null) {
@@ -82,9 +83,9 @@ export default function Calculator() {
 
     setWaitingForNewValue(true);
     setOperator(nextOperator);
-  };
+  }, [display, prevVal, operator]);
 
-  const handleEqual = () => {
+  const handleEqual = useCallback(() => {
     if (!operator || prevVal === null) return;
     const newValue = calculate(prevVal, display, operator);
     setDisplay(String(newValue));
@@ -96,9 +97,76 @@ export default function Calculator() {
     setPrevVal(null);
     setOperator(null);
     setWaitingForNewValue(true);
-  };
+  }, [operator, prevVal, display]);
 
-  const Button = ({ label, icon, onClick, variant = 'default', className = '' }) => {
+  // Keyboard event handler
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      // Prevent default for calculator keys
+      if (/^[0-9+\-*/=.%]$/.test(e.key) || ['Enter', 'Escape', 'Backspace', 'Delete'].includes(e.key)) {
+        e.preventDefault();
+      }
+
+      // Visual feedback
+      const keyMap = {
+        '0': '0', '1': '1', '2': '2', '3': '3', '4': '4',
+        '5': '5', '6': '6', '7': '7', '8': '8', '9': '9',
+        '+': '+', '-': '-', '*': '×', '/': '÷',
+        'Enter': '=', '=': '=', '.': '.',
+        'Escape': 'AC', 'Backspace': 'DEL', 'Delete': 'DEL',
+        '%': '%'
+      };
+      
+      const mappedKey = keyMap[e.key];
+      if (mappedKey) {
+        setActiveKey(mappedKey);
+        setTimeout(() => setActiveKey(null), 150);
+      }
+
+      // Handle number inputs
+      if (/^[0-9]$/.test(e.key)) {
+        inputDigit(e.key);
+      }
+      // Handle decimal point
+      else if (e.key === '.') {
+        inputDot();
+      }
+      // Handle operators
+      else if (e.key === '+') {
+        handleOperator('+');
+      }
+      else if (e.key === '-') {
+        handleOperator('-');
+      }
+      else if (e.key === '*') {
+        handleOperator('×');
+      }
+      else if (e.key === '/') {
+        handleOperator('÷');
+      }
+      // Handle equals
+      else if (e.key === 'Enter' || e.key === '=') {
+        handleEqual();
+      }
+      // Handle clear
+      else if (e.key === 'Escape') {
+        clearAll();
+      }
+      // Handle backspace/delete
+      else if (e.key === 'Backspace' || e.key === 'Delete') {
+        handleDelete();
+      }
+      // Handle percent
+      else if (e.key === '%') {
+        handlePercent();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [inputDigit, inputDot, handleOperator, handleEqual]);
+
+  const Button = ({ label, icon, onClick, variant = 'default', className = '', keyboardKey = null }) => {
     const baseStyle = "relative overflow-hidden flex items-center justify-center text-xl md:text-2xl font-black rounded-2xl md:rounded-[1.5rem] transition-all h-16 sm:h-[4.5rem] md:h-20 select-none";
     
     let variants = {
@@ -108,12 +176,15 @@ export default function Calculator() {
       danger: "bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-900 hover:bg-rose-200 dark:hover:bg-rose-900/50"
     };
 
+    const isActive = activeKey === (keyboardKey || label);
+
     return (
       <Motion.button 
         whileTap={{ scale: 0.92 }}
         whileHover={{ scale: 1.05, y: -2 }}
+        animate={isActive ? { scale: 0.92 } : { scale: 1 }}
         onClick={onClick}
-        className={`${baseStyle} ${variants[variant]} ${className}`}
+        className={`${baseStyle} ${variants[variant]} ${className} ${isActive ? 'ring-4 ring-pink-400/50' : ''}`}
       >
         {icon ? <Icon name={icon} className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8" /> : label}
       </Motion.button>
@@ -168,8 +239,8 @@ export default function Calculator() {
 
           {/* Keypad */}
           <div className="grid grid-cols-4 gap-2 sm:gap-3 md:gap-4">
-            <Button label="AC" onClick={clearAll} variant="danger" />
-            <Button icon="delete" onClick={handleDelete} variant="secondary" />
+            <Button label="AC" onClick={clearAll} variant="danger" keyboardKey="AC" />
+            <Button icon="delete" onClick={handleDelete} variant="secondary" keyboardKey="DEL" />
             <Button label="%" onClick={handlePercent} variant="secondary" />
             <Button label="÷" onClick={() => handleOperator('÷')} variant="primary" />
 

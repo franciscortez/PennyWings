@@ -7,16 +7,16 @@ import { startOfMonth, endOfMonth, format } from "date-fns";
 import Icon from "./Icon";
 import { getConfirm, confirmPresets } from "../utils/confirm";
 import AnimatedPage from "./common/AnimatedPage";
-import { motion as Motion } from "motion/react";
+import { motion as Motion, AnimatePresence } from "motion/react";
 
 const navigation = [
-  { name: "Dashboard", href: "/dashboard", icon: "bank" },
-  { name: "Accounts", href: "/accounts", icon: "card" },
-  { name: "Calculator", href: "/calculator", icon: "calculator" },
+  { name: "Dashboard", href: "/dashboard", icon: "bank", showInMobile: true },
+  { name: "Accounts", href: "/accounts", icon: "card", showInMobile: true },
   { 
     name: "Transactions", 
     href: "/transactions", 
     icon: "history",
+    showInMobile: true,
     prefetch: () => {
       // Prefetch Component
       import("../pages/Transactions");
@@ -34,6 +34,7 @@ const navigation = [
     name: "Reports", 
     href: "/reports", 
     icon: "reports",
+    showInMobile: true,
     prefetch: () => {
       // Prefetch Component
       import("../pages/Reports");
@@ -50,8 +51,9 @@ const navigation = [
       }
     }
   },
-  { name: "Monitoring", href: "/monitoring", icon: "wallet" },
-  { name: "Settings", href: "/profile", icon: "settings" },
+  { name: "Monitoring", href: "/monitoring", icon: "wallet", showInMobile: false },
+  { name: "Calculator", href: "/calculator", icon: "calculator", showInMobile: false },
+  { name: "Settings", href: "/profile", icon: "settings", showInMobile: false },
 ];
 
 
@@ -66,6 +68,7 @@ export default function Layout({ children }) {
     const saved = localStorage.getItem("sidebarOpen");
     return saved !== null ? saved === "true" : false;
   });
+  const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
 
   const toggleSidebar = () => {
     setIsSidebarOpen((prev) => {
@@ -109,28 +112,15 @@ export default function Layout({ children }) {
             PennyWings
           </span>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
           <Motion.button
             whileTap={{ scale: 0.9 }}
             onClick={toggleTheme}
-            className="w-8 h-8 bg-pink-50 dark:bg-dark-border rounded-full flex items-center justify-center text-pink-500 dark:text-pink-400 hover:bg-pink-100 dark:hover:bg-pink-900/30 transition-colors"
+            className="w-9 h-9 bg-pink-50 dark:bg-dark-border rounded-full flex items-center justify-center text-pink-500 dark:text-pink-400 hover:bg-pink-100 dark:hover:bg-pink-900/30 transition-colors"
             title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
           >
             <Icon name={theme === 'light' ? 'moon' : 'sun'} className="w-5 h-5" />
           </Motion.button>
-          <Link
-            to="/profile"
-            className="w-8 h-8 bg-pink-50 dark:bg-dark-border rounded-full flex items-center justify-center text-pink-500 dark:text-pink-400 hover:bg-pink-100 dark:hover:bg-pink-900/30 transition-colors"
-          >
-            <Icon name="user" className="w-5 h-5" />
-          </Link>
-          <button
-            onClick={handleLogout}
-            className="p-2 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-full transition-colors"
-            title="Sign Out"
-          >
-            <Icon name="logout" className="w-5 h-5" />
-          </button>
         </div>
       </div>
 
@@ -232,25 +222,111 @@ export default function Layout({ children }) {
       </main>
 
       {/* Mobile Navigation */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-dark-card border-t border-pink-100 dark:border-dark-border flex flex-nowrap overflow-x-auto no-scrollbar justify-between sm:justify-around p-1 sm:p-2 z-50 transition-colors">
-        {navigation.filter(item => item.name !== "Settings").map((item) => {
-          const isActive = location.pathname === item.href;
-          return (
-            <Link
-              key={item.name}
-              to={item.href}
-              onMouseEnter={() => item.prefetch?.()}
-              className={`flex flex-col items-center justify-center flex-1 min-w-[52px] px-0.5 sm:px-1 py-2 sm:py-2.5 rounded-xl transition-all text-center ${
-                isActive ? "text-pink-600 dark:text-pink-400 bg-pink-50/50 dark:bg-dark-border/30" : "text-gray-400 dark:text-dark-muted hover:text-pink-500"
-              }`}
-            >
-              <Icon name={item.icon} color="currentColor" className="w-5 h-5 sm:w-6 sm:h-6 mb-0.5" />
-              <span className="text-[8px] sm:text-[9.5px] font-extrabold uppercase tracking-tighter truncate w-full px-0.5">
-                {item.name}
-              </span>
-            </Link>
-          );
-        })}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-dark-card border-t border-pink-100 dark:border-dark-border z-50 transition-colors">
+        <div className="flex items-center justify-around p-2">
+          {navigation.filter(item => item.showInMobile).map((item) => {
+            const isActive = location.pathname === item.href;
+            return (
+              <Link
+                key={item.name}
+                to={item.href}
+                onMouseEnter={() => item.prefetch?.()}
+                className={`flex flex-col items-center justify-center flex-1 px-2 py-2.5 rounded-xl transition-all ${
+                  isActive ? "text-pink-600 dark:text-pink-400 bg-pink-50/50 dark:bg-dark-border/30" : "text-gray-400 dark:text-dark-muted"
+                }`}
+              >
+                <Icon name={item.icon} color="currentColor" className="w-6 h-6 mb-1" />
+                <span className="text-[9px] font-extrabold uppercase tracking-tight">
+                  {item.name}
+                </span>
+              </Link>
+            );
+          })}
+          
+          {/* More Menu Button */}
+          <button
+            onClick={() => setIsMoreMenuOpen(!isMoreMenuOpen)}
+            className={`flex flex-col items-center justify-center flex-1 px-2 py-2.5 rounded-xl transition-all ${
+              isMoreMenuOpen ? "text-pink-600 dark:text-pink-400 bg-pink-50/50 dark:bg-dark-border/30" : "text-gray-400 dark:text-dark-muted"
+            }`}
+          >
+            <Icon name="menu" color="currentColor" className="w-6 h-6 mb-1" />
+            <span className="text-[9px] font-extrabold uppercase tracking-tight">
+              More
+            </span>
+          </button>
+        </div>
+
+        {/* More Menu Dropdown */}
+        <AnimatePresence>
+          {isMoreMenuOpen && (
+            <>
+              <Motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setIsMoreMenuOpen(false)}
+                className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
+              />
+              <Motion.div
+                initial={{ y: 100, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: 100, opacity: 0 }}
+                transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                className="absolute bottom-full left-0 right-0 mb-2 mx-2 bg-white dark:bg-dark-card rounded-3xl border border-pink-100 dark:border-dark-border shadow-2xl overflow-hidden z-50"
+              >
+                <div className="p-2 space-y-1">
+                  {/* Other Navigation Items */}
+                  {navigation.filter(item => !item.showInMobile).map((item) => {
+                    const isActive = location.pathname === item.href;
+                    return (
+                      <Link
+                        key={item.name}
+                        to={item.href}
+                        onClick={() => setIsMoreMenuOpen(false)}
+                        className={`flex items-center gap-4 px-5 py-4 rounded-2xl transition-all ${
+                          isActive 
+                            ? "bg-pink-50 dark:bg-dark-border text-pink-600 dark:text-pink-400" 
+                            : "text-gray-700 dark:text-dark-text hover:bg-pink-50/50 dark:hover:bg-dark-border/50"
+                        }`}
+                      >
+                        <Icon name={item.icon} color="currentColor" className="w-6 h-6" />
+                        <span className="text-sm font-bold">{item.name}</span>
+                      </Link>
+                    );
+                  })}
+                  
+                  {/* Divider */}
+                  <div className="h-px bg-pink-100 dark:bg-dark-border my-2"></div>
+                  
+                  {/* Theme Toggle in More Menu */}
+                  <button
+                    onClick={() => {
+                      toggleTheme();
+                      setIsMoreMenuOpen(false);
+                    }}
+                    className="w-full flex items-center gap-4 px-5 py-4 rounded-2xl transition-all text-gray-700 dark:text-dark-text hover:bg-pink-50/50 dark:hover:bg-dark-border/50"
+                  >
+                    <Icon name={theme === 'light' ? 'moon' : 'sun'} color="currentColor" className="w-6 h-6" />
+                    <span className="text-sm font-bold">{theme === 'light' ? 'Dark' : 'Light'} Mode</span>
+                  </button>
+                  
+                  {/* Logout in More Menu */}
+                  <button
+                    onClick={() => {
+                      setIsMoreMenuOpen(false);
+                      handleLogout();
+                    }}
+                    className="w-full flex items-center gap-4 px-5 py-4 rounded-2xl transition-all text-rose-600 dark:text-rose-400 hover:bg-rose-50/50 dark:hover:bg-rose-900/20"
+                  >
+                    <Icon name="logout" color="currentColor" className="w-6 h-6" />
+                    <span className="text-sm font-bold">Sign Out</span>
+                  </button>
+                </div>
+              </Motion.div>
+            </>
+          )}
+        </AnimatePresence>
       </nav>
     </div>
   );
