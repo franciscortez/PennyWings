@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useDashboardData } from '../../hooks/useDashboardData';
 import { useBudgets } from '../../hooks/useBudgets';
@@ -26,40 +26,58 @@ export default function AIChatWindow({ isOpen, onClose }) {
     }
   }, [messages]);
 
-  const totalBalance = cards.reduce((sum, c) => sum + Number(c.balance || 0), 0) + 
-                       wallets.reduce((sum, w) => sum + Number(w.balance || 0), 0);
+  const totalBalance = useMemo(() => 
+    cards.reduce((sum, c) => sum + Number(c.balance || 0), 0) + 
+    wallets.reduce((sum, w) => sum + Number(w.balance || 0), 0),
+    [cards, wallets]
+  );
 
-  const budgetProgress = budgets.length > 0 
-    ? Math.round((budgets.reduce((sum, b) => sum + (budgetStats?.[b.category_id] || 0), 0) / 
-      budgets.reduce((sum, b) => sum + Number(b.limit_amount || 0), 0)) * 100) 
-    : 0;
+  const budgetProgress = useMemo(() => 
+    budgets.length > 0 
+      ? Math.round((budgets.reduce((sum, b) => sum + (budgetStats?.[b.category_id] || 0), 0) / 
+        budgets.reduce((sum, b) => sum + Number(b.limit_amount || 0), 0)) * 100) 
+      : 0,
+    [budgets, budgetStats]
+  );
 
-  const topCategory = budgets.length > 0
-    ? budgets.reduce((prev, current) => {
-        const prevSpent = budgetStats?.[prev.category_id] || 0;
-        const currentSpent = budgetStats?.[current.category_id] || 0;
-        return (prevSpent > currentSpent) ? prev : current;
-      }).category?.name
-    : 'N/A';
+  const topCategory = useMemo(() => 
+    budgets.length > 0
+      ? budgets.reduce((prev, current) => {
+          const prevSpent = budgetStats?.[prev.category_id] || 0;
+          const currentSpent = budgetStats?.[current.category_id] || 0;
+          return (prevSpent > currentSpent) ? prev : current;
+        }).category?.name
+      : 'N/A',
+    [budgets, budgetStats]
+  );
 
-  const detailedBudgets = budgets.map(b => {
-    const spent = budgetStats?.[b.category_id] || 0;
-    const limit = Number(b.limit_amount || 0);
-    return `${b.category?.name || 'Unknown'}: ₱${spent} / ₱${limit}`;
-  }).join(', ');
+  const detailedBudgets = useMemo(() => 
+    budgets.map(b => {
+      const spent = budgetStats?.[b.category_id] || 0;
+      const limit = Number(b.limit_amount || 0);
+      return `${b.category?.name || 'Unknown'}: ₱${spent} / ₱${limit}`;
+    }).join(', '),
+    [budgets, budgetStats]
+  );
 
-  const accountBalances = [
-    ...cards.map(c => `${c.card_name} (Card): ₱${c.balance}`),
-    ...wallets.map(w => `${w.wallet_name} (eWallet): ₱${w.balance}`)
-  ].join(', ');
+  const accountBalances = useMemo(() => 
+    [
+      ...cards.map(c => `${c.card_name} (Card): ₱${c.balance}`),
+      ...wallets.map(w => `${w.wallet_name} (eWallet): ₱${w.balance}`)
+    ].join(', '),
+    [cards, wallets]
+  );
 
-  const recentTransactions = transactions?.map(t => {
-    const isExpense = t.type === 'expense' || t.type === 'withdrawal';
-    const amountStr = `${isExpense ? '-' : '+'}₱${t.amount}`;
-    return `${t.transaction_date?.split('T')[0]} | ${amountStr} | ${t.description || t.category?.name || 'Transfer'}`;
-  }).join('\n') || 'None';
+  const recentTransactions = useMemo(() => 
+    transactions?.map(t => {
+      const isExpense = t.type === 'expense' || t.type === 'withdrawal';
+      const amountStr = `${isExpense ? '-' : '+'}₱${t.amount}`;
+      return `${t.transaction_date?.split('T')[0]} | ${amountStr} | ${t.description || t.category?.name || 'Transfer'}`;
+    }).join('\n') || 'None',
+    [transactions]
+  );
 
-  const userContext = {
+  const userContext = useMemo(() => ({
     totalBalance,
     monthlyExpenses: monthlyStats.expenses,
     monthlyIncome: monthlyStats.income,
@@ -69,7 +87,7 @@ export default function AIChatWindow({ isOpen, onClose }) {
     accountBalances,
     recentTransactions,
     userName: profile?.full_name || user?.user_metadata?.full_name || 'Friend'
-  };
+  }), [totalBalance, monthlyStats, topCategory, budgetProgress, detailedBudgets, accountBalances, recentTransactions, profile, user]);
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;

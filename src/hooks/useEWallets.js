@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from "react";
+import { useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../lib/supabase";
 import { useAuth } from "../hooks/useAuth";
@@ -70,23 +70,7 @@ export const useEWallets = () => {
     },
   });
 
-  useEffect(() => {
-    if (user) {
-      const subscription = supabase
-        .channel("e_wallets_changes")
-        .on("postgres_changes",
-          { event: "*", schema: "public", table: "e_wallets", filter: `user_id=eq.${user.id}` },
-          () => {
-            queryClient.invalidateQueries({ queryKey: ["e_wallets", user.id] });
-          }
-        )
-        .subscribe();
-
-      return () => {
-        supabase.removeChannel(subscription);
-      };
-    }
-  }, [user, queryClient]);
+  // Real-time subscription removed (now handled by useRealtimeSync in Layout)
 
   return {
     wallets: walletsQuery.data || [],

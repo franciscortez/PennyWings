@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { useTheme } from "../contexts/ThemeContext";
+import { useRealtimeSync } from "../hooks/useRealtimeSync";
 import { queryClient } from "../lib/queryClient";
 import { startOfMonth, endOfMonth, format } from "date-fns";
 import Icon from "./Icon";
@@ -64,6 +65,10 @@ export default function Layout({ children }) {
   const { profile, signOut } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const location = useLocation();
+  
+  // Centralized real-time sync (replaces individual hook subscriptions)
+  useRealtimeSync();
+  
   const [isSidebarOpen, setIsSidebarOpen] = useState(() => {
     const saved = localStorage.getItem("sidebarOpen");
     return saved !== null ? saved === "true" : false;

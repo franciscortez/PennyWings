@@ -70,23 +70,7 @@ export const useBankCards = () => {
     },
   });
 
-  useEffect(() => {
-    if (user) {
-      const subscription = supabase
-        .channel("bank_cards_changes")
-        .on("postgres_changes",
-          { event: "*", schema: "public", table: "bank_cards", filter: `user_id=eq.${user.id}` },
-          () => {
-            queryClient.invalidateQueries({ queryKey: ["bank_cards", user.id] });
-          }
-        )
-        .subscribe();
-
-      return () => {
-        supabase.removeChannel(subscription);
-      };
-    }
-  }, [user, queryClient]);
+  // Real-time subscription removed (now handled by useRealtimeSync in Layout)
 
   return {
     cards: cardsQuery.data || [],
