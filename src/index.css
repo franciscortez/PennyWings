@@ -111,6 +111,18 @@ body {
   @apply bg-pink-800/70;
 }
 
+/* Sidebar Performance Optimization */
+.sidebar-optimized {
+  will-change: width;
+  contain: layout style;
+}
+
+.sidebar-content-fade {
+  will-change: opacity;
+  backface-visibility: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
 /* Hide scrollbar for mobile */
 .no-scrollbar::-webkit-scrollbar {
   display: none;

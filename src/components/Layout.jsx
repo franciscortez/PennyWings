@@ -131,35 +131,35 @@ export default function Layout({ children }) {
 
       {/* Sidebar (Desktop) */}
       <aside 
-        className={`hidden md:flex flex-col bg-white dark:bg-dark-card border-r border-pink-100 dark:border-dark-border h-screen fixed top-0 left-0 transition-all duration-300 z-40 ${
+        className={`sidebar-optimized hidden md:flex flex-col bg-white dark:bg-dark-card border-r border-pink-100 dark:border-dark-border h-screen fixed top-0 left-0 z-40 transition-[width] duration-300 ease-out ${
           isSidebarOpen ? "w-64" : "w-20"
         }`}
       >
         <div className={`p-6 flex items-center ${isSidebarOpen ? "justify-between" : "justify-center"}`}>
-          {isSidebarOpen && (
-            <div className="flex items-center gap-2">
-              <div className="w-10 h-10 bg-pink-500 rounded-xl flex items-center justify-center shrink-0">
-                <svg
-                  className="w-6 h-6 text-white"
-                  viewBox="0 0 100 100"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path d="M 48 20 C 40 10 30 15 35 20" stroke="currentColor" strokeWidth="2" fill="none" />
-                  <path d="M 52 20 C 60 10 70 15 65 20" stroke="currentColor" strokeWidth="2" fill="none" />
-                  <path d="M 48 30 C 20 -5 0 20 15 45 C 0 65 20 95 48 65 Z" fill="currentColor" fillOpacity="0.4" stroke="currentColor" strokeWidth="2" />
-                  <path d="M 52 30 C 80 -5 100 20 85 45 C 100 65 80 95 52 65 Z" fill="currentColor" fillOpacity="0.4" stroke="currentColor" strokeWidth="2" />
-                  <circle cx="25" cy="30" r="3" fill="currentColor" fillOpacity="0.2" />
-                  <circle cx="75" cy="30" r="3" fill="currentColor" fillOpacity="0.2" />
-                  <rect x="47" y="20" width="6" height="45" rx="3" fill="currentColor" />
-                  <circle cx="50" cy="18" r="4" fill="currentColor" />
-                </svg>
-              </div>
-              <span className="text-xl font-bold bg-gradient-to-r from-pink-600 to-pink-500 dark:from-pink-400 dark:to-pink-500 bg-clip-text text-transparent tracking-tight whitespace-nowrap">
-                PennyWings
-              </span>
+          <div className={`sidebar-content-fade flex items-center gap-2 overflow-hidden transition-all duration-300 ${
+            isSidebarOpen ? "opacity-100 w-auto" : "opacity-0 w-0"
+          }`}>
+            <div className="w-10 h-10 bg-pink-500 rounded-xl flex items-center justify-center shrink-0">
+              <svg
+                className="w-6 h-6 text-white"
+                viewBox="0 0 100 100"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path d="M 48 20 C 40 10 30 15 35 20" stroke="currentColor" strokeWidth="2" fill="none" />
+                <path d="M 52 20 C 60 10 70 15 65 20" stroke="currentColor" strokeWidth="2" fill="none" />
+                <path d="M 48 30 C 20 -5 0 20 15 45 C 0 65 20 95 48 65 Z" fill="currentColor" fillOpacity="0.4" stroke="currentColor" strokeWidth="2" />
+                <path d="M 52 30 C 80 -5 100 20 85 45 C 100 65 80 95 52 65 Z" fill="currentColor" fillOpacity="0.4" stroke="currentColor" strokeWidth="2" />
+                <circle cx="25" cy="30" r="3" fill="currentColor" fillOpacity="0.2" />
+                <circle cx="75" cy="30" r="3" fill="currentColor" fillOpacity="0.2" />
+                <rect x="47" y="20" width="6" height="45" rx="3" fill="currentColor" />
+                <circle cx="50" cy="18" r="4" fill="currentColor" />
+              </svg>
             </div>
-          )}
+            <span className="text-xl font-bold bg-gradient-to-r from-pink-600 to-pink-500 dark:from-pink-400 dark:to-pink-500 bg-clip-text text-transparent tracking-tight whitespace-nowrap">
+              PennyWings
+            </span>
+          </div>
           <button
             onClick={toggleSidebar}
             className={`p-1.5 text-gray-400 dark:text-dark-muted hover:text-pink-500 dark:hover:text-pink-400 hover:bg-pink-50 dark:hover:bg-dark-border rounded-lg transition-colors ${!isSidebarOpen ? "mt-2" : ""}`}
@@ -177,7 +177,7 @@ export default function Layout({ children }) {
                 key={item.name}
                 to={item.href}
                 onMouseEnter={() => item.prefetch?.()}
-                className={`flex items-center ${isSidebarOpen ? "gap-3 px-4" : "justify-center px-0"} py-3 rounded-xl font-medium transition-all ${
+                className={`flex items-center ${isSidebarOpen ? "gap-3 px-4" : "justify-center px-0"} py-3 rounded-xl font-medium transition-[background-color,color,padding,gap] duration-200 ${
                   isActive
                     ? "bg-pink-50 dark:bg-pink-900/20 text-pink-600 dark:text-pink-400"
                     : "text-gray-500 dark:text-dark-muted hover:bg-pink-50/50 dark:hover:bg-dark-border hover:text-pink-500 dark:hover:text-pink-400"
@@ -187,9 +187,11 @@ export default function Layout({ children }) {
                 <Icon
                   name={item.icon}
                   color="currentColor"
-                  className="shrink-0 transition-all w-6 h-6"
+                  className="shrink-0 w-6 h-6"
                 />
-                {isSidebarOpen && <span className="truncate">{item.name}</span>}
+                <span className={`truncate transition-[opacity,width] duration-300 ${
+                  isSidebarOpen ? "opacity-100 w-auto" : "opacity-0 w-0"
+                }`}>{item.name}</span>
               </Link>
             );
           })}
@@ -198,25 +200,29 @@ export default function Layout({ children }) {
         <div className="p-4 border-t border-pink-50 dark:border-dark-border space-y-2">
           <button
             onClick={toggleTheme}
-            className={`w-full flex items-center ${isSidebarOpen ? "gap-3 px-4" : "justify-center px-0"} py-2 text-gray-400 dark:text-dark-muted hover:text-pink-500 dark:hover:text-pink-400 hover:bg-pink-50 dark:hover:bg-dark-border rounded-lg transition-all duration-200 text-sm font-black italic active:scale-95`}
+            className={`w-full flex items-center ${isSidebarOpen ? "gap-3 px-4" : "justify-center px-0"} py-2 text-gray-400 dark:text-dark-muted hover:text-pink-500 dark:hover:text-pink-400 hover:bg-pink-50 dark:hover:bg-dark-border rounded-lg transition-[background-color,color,padding,gap] duration-200 text-sm font-black italic active:scale-95`}
             title={!isSidebarOpen ? `Switch to ${theme === 'light' ? 'dark' : 'light'} mode` : undefined}
           >
             <Icon name={theme === 'light' ? 'moon' : 'sun'} className="w-6 h-6 shrink-0" />
-            {isSidebarOpen && <span>{theme === 'light' ? 'Dark' : 'Light'} Mode</span>}
+            <span className={`transition-[opacity,width] duration-300 ${
+              isSidebarOpen ? "opacity-100 w-auto" : "opacity-0 w-0 overflow-hidden"
+            }`}>{theme === 'light' ? 'Dark' : 'Light'} Mode</span>
           </button>
           <button
             onClick={handleLogout}
-            className={`w-full flex items-center ${isSidebarOpen ? "gap-3 px-4" : "justify-center px-0"} py-2 text-gray-400 dark:text-dark-muted hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-lg transition-colors text-sm font-black italic active:scale-95`}
+            className={`w-full flex items-center ${isSidebarOpen ? "gap-3 px-4" : "justify-center px-0"} py-2 text-gray-400 dark:text-dark-muted hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-lg transition-[background-color,color,padding,gap] duration-200 text-sm font-black italic active:scale-95`}
             title={!isSidebarOpen ? "Sign Out" : undefined}
           >
             <Icon name="logout" className="w-6 h-6 shrink-0" />
-            {isSidebarOpen && <span>Sign Out</span>}
+            <span className={`transition-[opacity,width] duration-300 ${
+              isSidebarOpen ? "opacity-100 w-auto" : "opacity-0 w-0 overflow-hidden"
+            }`}>Sign Out</span>
           </button>
         </div>
       </aside>
 
       {/* Main Content */}
-      <main className={`flex-1 w-full relative transition-all duration-300 ${isSidebarOpen ? "md:ml-64" : "md:ml-20"}`}>
+      <main className={`flex-1 w-full relative transition-[margin] duration-300 ease-out ${isSidebarOpen ? "md:ml-64" : "md:ml-20"}`}>
         <AnimatedPage className="max-w-6xl mx-auto p-4 md:p-8 lg:p-12">
           {children}
         </AnimatedPage>

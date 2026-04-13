@@ -65,24 +65,20 @@ export default function CardItem({ card, onEdit, onDelete }) {
       
       <div className="flex items-center justify-between px-2">
         <div className="flex items-center gap-3">
-          <Motion.button 
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
+          <button 
             onClick={() => onEdit(card)}
-            className="p-3 text-gray-400 dark:text-dark-muted hover:text-pink-500 dark:hover:text-pink-400 hover:bg-pink-50 dark:hover:bg-pink-900/20 rounded-xl transition-all"
+            className="p-3 text-gray-400 dark:text-dark-muted hover:text-pink-500 dark:hover:text-pink-400 hover:bg-pink-50 dark:hover:bg-pink-900/20 rounded-xl transition-all active:scale-95"
             title="Edit Card"
           >
             <Icon name="edit" color="currentColor" className="w-5 h-5" />
-          </Motion.button>
-          <Motion.button 
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
+          </button>
+          <button 
             onClick={() => onDelete(card.id)}
-            className="p-3 text-gray-400 dark:text-dark-muted hover:text-rose-500 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-xl transition-all"
+            className="p-3 text-gray-400 dark:text-dark-muted hover:text-rose-500 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-xl transition-all active:scale-95"
             title="Delete Card"
           >
             <Icon name="delete" color="currentColor" className="w-5 h-5" />
-          </Motion.button>
+          </button>
         </div>
         
         <div 

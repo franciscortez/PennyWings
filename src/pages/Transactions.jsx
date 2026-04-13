@@ -301,22 +301,18 @@ export default function Transactions() {
                         </td>
                         <td className="px-8 py-6 text-center">
                           <div className="flex items-center justify-center gap-1">
-                            <Motion.button 
-                              whileHover={{ scale: 1.1, backgroundColor: theme === 'dark' ? '#312e8166' : '#F0F9FF' }}
-                              whileTap={{ scale: 0.9 }}
+                            <button 
                               onClick={() => handleOpenEdit(tx)}
-                              className="p-3 text-gray-200 dark:text-dark-muted hover:text-blue-500 rounded-xl transition-colors"
+                              className="p-3 text-gray-200 dark:text-dark-muted hover:text-blue-500 hover:bg-sky-50 dark:hover:bg-blue-900/20 rounded-xl transition-all active:scale-95"
                             >
                               <Icon name="edit" color="currentColor" className="w-5 h-5" />
-                            </Motion.button>
-                            <Motion.button 
-                              whileHover={{ scale: 1.1, backgroundColor: theme === 'dark' ? '#312e8166' : '#FFF1F2' }}
-                              whileTap={{ scale: 0.9 }}
+                            </button>
+                            <button 
                               onClick={() => handleDeleteTransaction(tx)}
-                              className="p-3 text-gray-200 dark:text-dark-muted hover:text-rose-500 rounded-xl transition-colors"
+                              className="p-3 text-gray-200 dark:text-dark-muted hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-xl transition-all active:scale-95"
                             >
                               <Icon name="delete" color="currentColor" className="w-5 h-5" />
-                            </Motion.button>
+                            </button>
                           </div>
                         </td>
                       </Motion.tr>
